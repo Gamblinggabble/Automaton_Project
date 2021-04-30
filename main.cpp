@@ -1,4 +1,5 @@
 #include <iostream>
+#include "AutomatonException.h"
 #include "DeterminateFiniteAutomaton.h"
 
 using namespace std;
@@ -10,8 +11,10 @@ int main() {
 	DeterminateFiniteAutomaton<int> autom1(5, arr1);
 	DeterminateFiniteAutomaton<int> autom = DeterminateFiniteAutomaton<int>(5, arr1);
 
+
 	autom.printAlphabet(); cout << endl;
 	autom1.printAlphabet(); cout << endl;
+
 
 
 	return 0;
