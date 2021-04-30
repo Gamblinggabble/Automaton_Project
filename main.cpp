@@ -1,6 +1,7 @@
 #include <iostream>
 #include "AutomatonException.h"
 #include "DeterminateFiniteAutomaton.h"
+#include "State.h"
 
 using namespace std;
 
@@ -15,7 +16,9 @@ int main() {
 	autom.printAlphabet(); cout << endl;
 	autom1.printAlphabet(); cout << endl;
 
-
+	//State s1;
+	//State s2("green");
+	//s1 = s2;
 
 	return 0;
 }
