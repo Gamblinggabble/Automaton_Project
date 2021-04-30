@@ -4,6 +4,9 @@
     <ClCompile Include="DeterminateFiniteAutomaton.cpp" />
     <ClCompile Include="AutomatonException.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DeterminateFiniteAutomaton.h" />
     <ClCompile Include="State.cpp" />
   </ItemGroup>
   <ItemGroup>
