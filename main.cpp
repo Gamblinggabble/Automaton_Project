@@ -14,5 +14,6 @@ int main() {
 	autom.printAlphabet(); cout << endl;
 	autom1.printAlphabet(); cout << endl;
 
+
 	return 0;
 }
