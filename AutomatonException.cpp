@@ -1,12 +1,38 @@
 #include "AutomatonException.h"
 
 
-AutomatonException::AutomatonException(const char* msg, const char* stateTry, const char* stateMarked, const char* file, int line, const char* func):std::exception(msg){
-	this->stateTry = stateTry;
-	this->stateMarked = stateMarked;
-	this->file = file;
+AutomatonException::AutomatonException(const char* msg, const char* stateTry, const char* stateMarked, const char* file, int line, const char* func) :std::exception(msg) {
+	//not commited
+	this->stateTry = new char[strlen(stateTry) + 1];
+	strcpy_s(this->stateTry, strlen(stateTry) + 1, stateTry);
+
+	this->stateMarked = new char[strlen(stateMarked) + 1];
+	strcpy_s(this->stateMarked, strlen(stateMarked) + 1, stateMarked);
+
+	this->file - new char[strlen(file) + 1];
+	strcpy_s(this->file, strlen(file) + 1, file);
+
 	this->line = line;
-	this->func = func;
+
+	this->func = new char[strlen(func) + 1]; 
+	strcpy_s(this->func, strlen(func) + 1, func);
+
+
+}
+
+AutomatonException::~AutomatonException() {
+	if (stateTry != nullptr) {
+		delete[] stateTry;
+	}
+	if (stateMarked != nullptr) {
+		delete[] stateMarked;
+	}
+	if (file != nullptr) {
+		delete[] file;
+	}
+	if (func != nullptr) {
+		delete[] func;
+	}
 }
 
 const char* AutomatonException::getFile() const{
