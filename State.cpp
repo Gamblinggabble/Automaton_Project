@@ -34,3 +34,9 @@ State::~State() {
 		delete[] stateName;
 	}
 }
+
+std::ostream& operator<<(std::ostream& out, State& rhs) {
+	out << rhs.getStateName();
+	return out;
+}
+

@@ -19,6 +19,8 @@ public:
 	int setEntryState(char*);
 	int setEntryState(State);
 	State getEntryState() const;
+	unsigned getAlphabetSize() const;
+	unsigned getStatesCnt() const;
 
 	int printAlphabet();
 private:
@@ -195,6 +197,16 @@ int DFAutomaton<T>::setEntryState(State state) {
 template<typename T>
 State DFAutomaton<T>::getEntryState() const {
 	return entryState;
+}
+
+template<typename T>
+unsigned DFAutomaton<T>::getAlphabetSize() const {
+	return alphabetSize;
+}
+
+template<typename T>
+unsigned DFAutomaton<T>::getStatesCnt() const {
+	return statesCnt;
 }
 
 #endif

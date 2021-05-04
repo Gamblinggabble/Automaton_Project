@@ -4,10 +4,12 @@
     <ClCompile Include="DeterminateFiniteAutomaton.cpp" />
     <ClCompile Include="AutomatonException.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TransitionTable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeterminateFiniteAutomaton.h" />
     <ClCompile Include="State.cpp" />
+    <ClInclude Include="TransitionTable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeterminateFiniteAutomaton.h" />
