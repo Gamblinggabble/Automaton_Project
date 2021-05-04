@@ -10,22 +10,22 @@
 class AutomatonStateException :public std::exception {
 
 public:
-	//costructor + get-ers
-	AutomatonStateException(const State&, const char* file = "No data", const char* fn = "No data", unsigned line = 0);
+
+	AutomatonStateException(const State& stateNotFound, const char* file = "No data", const char* fn = "No data", unsigned line = 0);
 	~AutomatonStateException();
 	const char* getFile() const;
 	const char* getFn() const;
+	const State& getStateNotFound() const;
 	unsigned getLine() const;
-	int print() const;
-
+	
 private:
 
 	char* file;
 	char* fn;
 	unsigned line;
-	State& stateNotFound;
+	State stateNotFound;
 };
 
-std::ostream& operator<<(std::ostream&, AutomatonStateException&);
+std::ostream& operator<<(std::ostream&,const AutomatonStateException&);
 
 #endif

@@ -21,6 +21,9 @@ State& State::operator=(const State& rhs) {
 }
 
 int State::setStateName(char* name) {
+	if (stateName != nullptr) {
+		delete[] stateName;
+	}
 	stateName = new char[strlen(name) + 1];
 	strcpy_s(stateName, strlen(name) + 1, name);
 	return 0;
@@ -41,12 +44,9 @@ std::ostream& operator<<(std::ostream& out,const State& rhs) {
 }
 
 std::istream& operator>>(std::istream& in, State& rhs) {
-	char* name;
-	in >> name;
-	rhs.setStateName(name);
-	if (name != nullptr) {
-		delete[] name;
-	};
+	char inputName[MAX_LENGHT_NAME];
+	in >> inputName;
+	rhs.setStateName(inputName);
 	return in;
 }
 

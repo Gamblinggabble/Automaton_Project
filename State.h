@@ -7,6 +7,7 @@
 using std::cout;
 using std::cin;
 
+const unsigned MAX_LENGHT_NAME = 100;
 
 class State
 {
