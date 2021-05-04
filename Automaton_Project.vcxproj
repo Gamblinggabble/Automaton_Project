@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AutomatonStateException.cpp" />
     <ClCompile Include="DeterminateFiniteAutomaton.cpp" />
     <ClCompile Include="AutomatonException.cpp" />
     <ClCompile Include="main.cpp" />
@@ -146,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutomatonException.h" />
+    <ClInclude Include="AutomatonStateException.h" />
     <ClInclude Include="DeterminateFiniteAutomaton.h" />
     <ClInclude Include="State.h" />
   </ItemGroup>
