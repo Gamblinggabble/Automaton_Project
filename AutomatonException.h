@@ -7,6 +7,7 @@
 class AutomatonException:public std::exception{
 	//AutomatonException a("Error msg", "Wanted entry state", "Current entry state", __FILE__, __LINE__, __FUNCTION__)
 public:
+	//TODO: Simo - BIGFIVE
 	AutomatonException(const char* msg= "No data", const char* stateTry= "No data", const char* stateMarked= "No data", const char* file ="No data", int line = 0, const char*  func= "No data");
 	~AutomatonException();
 	const char* getFile() const;
