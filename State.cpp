@@ -35,8 +35,18 @@ State::~State() {
 	}
 }
 
-std::ostream& operator<<(std::ostream& out, State& rhs) {
+std::ostream& operator<<(std::ostream& out,const State& rhs) {
 	out << rhs.getStateName();
 	return out;
+}
+
+std::istream& operator>>(std::istream& in, State& rhs) {
+	char* name;
+	in >> name;
+	rhs.setStateName(name);
+	if (name != nullptr) {
+		delete[] name;
+	};
+	return in;
 }
 
