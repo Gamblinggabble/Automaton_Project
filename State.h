@@ -26,9 +26,7 @@ private:
 
 };
 
-std::ostream& operator<<(std::ostream&, State&);
-
-//TODO: Dari - predefined operator >>;
-//State s1;
+std::ostream& operator<<(std::ostream&,const State&);
+std::istream& operator>>(std::istream&, State&);
 
 #endif
