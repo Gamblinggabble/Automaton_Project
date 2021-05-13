@@ -9,7 +9,7 @@ template <typename T>
 class DFAutomaton
 {
 public:
-	DFAutomaton(unsigned alphabetSize = 0, T* alphabet = nullptr, unsigned statesCnt = 0, State* states = nullptr, const State& entryState = NULL,
+	DFAutomaton(unsigned alphabetSize = 0, T* alphabet = nullptr, unsigned statesCnt = 0, State* states = nullptr, State** = nullptr, const State& entryState = NULL,
 		unsigned finalStatesCnt = 0, State* finalStates = nullptr);
 	DFAutomaton(const DFAutomaton&);
 	~DFAutomaton();
@@ -21,8 +21,11 @@ public:
 	State getEntryState() const;
 	unsigned getAlphabetSize() const;
 	unsigned getStatesCnt() const;
+	State* getStates() const;
+	T* getAlphabet() const;
 
 	int printAlphabet();
+	int fillDFAutomatonConsole();
 private:
 	T* alphabet;
 	unsigned alphabetSize;
@@ -30,15 +33,21 @@ private:
 	unsigned statesCnt;
 	State* states;
 	//only one entry state can exist
+	State** transitionTable;
 	State entryState;
 	//zero or more finalStates
 	unsigned finalStatesCnt;
 	State* finalStates;
 };
 
+template <typename T>
+std::istream& operator>>(std::istream& in, DFAutomaton<T>& rhs) {
+	rhs.fillDFAutomatonConsole();
+	return in;
+}
 
 template <typename T>
-DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesCnt, State* states, const State& entryState,
+DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesCnt, State* states, State** transitionTable, const State& entryState,
 	unsigned finalStatesCnt, State* finalStates)
 	:statesCnt(statesCnt), states(new State[statesCnt]), entryState(entryState), finalStatesCnt(finalStatesCnt),
 	finalStates(new State[finalStatesCnt])
@@ -63,7 +72,7 @@ DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesC
 			this->states[i] = states[i];
 		}
 
-		if (finalStates != nullptr) {
+		if (finalStates != nullptr) { //Симо - според мен тази функция трябва да е извън блока на горната
 			for (unsigned j = 0; j < this->finalStatesCnt; j++)
 			{
 				this->finalStates[j] = finalStates[j];
@@ -72,6 +81,23 @@ DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesC
 		else this->finalStates = nullptr;
 	}
 	else this->states = nullptr;
+
+
+	//добавяне на transition table
+	if (transitionTable != nullptr) {
+		//деклариране
+		this->transitionTable = new State * [this->statesCnt];
+		for (int i = 0; i < this->statesCnt; i++) {
+			this->transitionTable[i] = new State[this->alphabetSize];
+		}
+		//инициализиране/ копиране от параметъра
+		for (int r = 0; r < this->statesCnt; r++) {
+			for (int c = 0; c < this->alphabetSize; c++) {
+				this->transitionTable[r][c] = transitionTable[r][c];
+			}
+		}
+	}
+	else this->transitionTable = nullptr;
 }
 
 
@@ -107,6 +133,30 @@ DFAutomaton<T>::DFAutomaton(const DFAutomaton<T>& rhs)
 		else this->finalStates = nullptr;
 	}
 	else this->states = nullptr;
+
+	//добавяне на transition table
+	//размерите вече са присвоени от горните редове код, поради което осъществяваме само копиране
+	if (rhs.transitionTable != nullptr) {
+		//трием старата таблица
+		for (int i = 0; i < statesCnt; i++) {
+			delete[] transitionTable[i];
+		}
+		delete[] transitionTable;
+
+		//създаваме нова
+		transitionTable = new State * [statesCnt];
+		for (int i = 0; i < statesCnt; i++) {
+			transitionTable[i] = new State[alphabetSize];
+		}
+
+		//копираме елементите от таблицата на единия автомат в таблицата на другия
+		for (int r = 0; r < statesCnt; r++) {
+			for (int c = 0; c < alphabetSize; c++) {
+				transitionTable[r][c] = rhs.transitionTable[r][c];
+			}
+		}
+	}
+	else transitionTable = nullptr;
 }
 
 template <typename T>
@@ -119,6 +169,14 @@ DFAutomaton<T>::~DFAutomaton() {
 	}
 	if (states != nullptr) {
 		delete[] states;
+	}
+
+	//изтриваме transition table
+	if (transitionTable != nullptr) {
+		for (int i = 0; i < statesCnt; i++) {
+			delete[] transitionTable[i];
+		}
+		delete[] transitionTable;
 	}
 }
 
@@ -156,6 +214,30 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 			this->statesCnt = 0;
 			this->states = nullptr;
 		}
+
+		//добавяне на transition table
+		if (rhs.transitionTable != nullptr) {
+			//трием старата таблица
+			for (int i = 0; i < statesCnt; i++) {
+				delete[] transitionTable[i];
+			}
+			delete[] transitionTable;
+
+			//създаваме нова
+			transitionTable = new State * [statesCnt];
+			for (int i = 0; i < statesCnt; i++) {
+				transitionTable[i] = new State[alphabetSize];
+			}
+
+			//копираме елементите от таблицата на единия автомат в таблицата на другия
+			for (int r = 0; r < statesCnt; r++) {
+				for (int c = 0; c < alphabetSize; c++) {
+					transitionTable[r][c] = rhs.transitionTable[r][c];
+				}
+			}
+		}
+		else transitionTable = nullptr;
+
 	}
 
 	return *this;
@@ -208,5 +290,126 @@ template<typename T>
 unsigned DFAutomaton<T>::getStatesCnt() const {
 	return statesCnt;
 }
+
+template<typename T>
+State* DFAutomaton<T>::getStates() const {
+	return states;
+}
+
+template<typename T>
+T* DFAutomaton<T>::getAlphabet() const {
+	return alphabet;
+}
+
+template<typename T>
+int DFAutomaton<T>::fillDFAutomatonConsole() {
+	//брой състояния
+	std::cout << "Please enter number of states: ";
+	std::cin >> statesCnt;
+	//състоянията
+	if (states != nullptr) {
+		delete[]states;
+	}
+	states = new State[statesCnt];
+	for (int i = 0; i < statesCnt; i++) {
+		std::cout << "Please enter state [" << i + 1 << "]: ";
+		std::cin >> states[i];
+	}
+
+	//брой елементи в азбуката
+	std::cout << "Please enter number of symbols in the alphabet: ";
+	std::cin >> alphabetSize;
+
+	//въвеждане на елементите на азбуката
+	if (alphabet != nullptr) {
+		delete[] alphabet;
+	}
+	alphabet = new T[alphabetSize];
+
+	for (int i = 0; i < alphabetSize; i++) {
+		std::cout << "Please enter symbol number [" << i + 1 << "]: ";
+		std::cin >> alphabet[i];
+	}
+
+	//изтриване на старата таблица и инициализация на transition table с новите данни
+	if (transitionTable != nullptr) {
+		for (int i = 0; i < statesCnt; i++) {
+			delete[] transitionTable[i];
+		}
+		delete[] transitionTable;
+	}
+	
+	transitionTable = new State * [statesCnt];
+	for (int i = 0; i < statesCnt; i++) {
+		transitionTable[i] = new State[alphabetSize];
+	}
+
+	//TODO Въвеждаме transition table
+	for (int i = 0; i < statesCnt; i++) {
+		for (int j = 0; j < alphabetSize; j++) {
+			std::cout << "Please enter (" << states[i] << "," << alphabet[j] << "): ";
+			std::cin >> transitionTable[i][j];
+			//TODO Проверка на входа
+			bool inputTransitionCheck = false;
+			while (!inputTransitionCheck) {
+				for (int k = 0; k < statesCnt; k++) {
+					if (strcmp(states[k].getStateName(), transitionTable[i][j].getStateName()) == 0) inputTransitionCheck = true;
+				}
+				if (!inputTransitionCheck) {
+					std::cout << "There isn't such a state in the current automaton. Please enter another one: ";
+					std::cin >> transitionTable[i][j];
+				}
+			}
+		}
+	}
+
+	//въвеждане на начално състояние
+	std::cout << "Please enter an entry state: ";
+	std::cin >> entryState;
+	bool stateFlag = false;
+	while (!stateFlag) {
+		for (int k = 0; k < statesCnt; k++) {
+			if (strcmp(entryState.getStateName(), states[k].getStateName()) == 0) stateFlag = true;
+		}
+		if (!stateFlag) {
+			std::cout << "You can't enter this entry state, because there isn't such a state in the current automaton. Please enter another one: ";
+			std::cin >> entryState;
+		}
+	}
+
+	//въвеждане на брой крайни състояния
+	std::cout << "Please enter the number of final states: ";
+	std::cin >> finalStatesCnt;
+
+	//изтриване на стария масив с крайни състояния и създаване на нов
+	if (finalStates != nullptr) {
+		delete[] finalStates;
+	}
+	finalStates = new State[finalStatesCnt];
+
+	//въвеждане на крайните състояния
+	for (int i = 0; i < finalStatesCnt; i++) {
+		std::cout << "Enter final state number [" << i+1 << "]: ";
+		std::cin >> finalStates[i];
+		stateFlag = false;
+		while (!stateFlag) {
+			for (int k = 0; k < statesCnt; k++) {
+				if (strcmp(finalStates[i].getStateName(), states[k].getStateName()) == 0) stateFlag = true;
+			}
+			if (!stateFlag) {
+				std::cout << "You can't enter this final state, because there isn't such a state in the current automaton. Please enter another one: ";
+				std::cin >> finalStates[i];
+			}
+		}
+	}
+
+	return 0;
+}
+
+//TODO Simo
+//2filler
+//2predefined functions
+//TransitionTable
+//2predefined functions
 
 #endif
