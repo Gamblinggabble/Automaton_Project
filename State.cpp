@@ -1,7 +1,7 @@
 #include "State.h"
 
 
-State::State(const char* name):stateName(new char [strlen(name)+1]) {
+State::State(const char* name):stateName(new char[strlen(name)+1]) {
 	strcpy_s(stateName, strlen(name) + 1, name);
 }
 
