@@ -9,12 +9,21 @@ class AutomatonException:public std::exception{
 public:
 	//TODO: Simo - BIGFIVE
 	AutomatonException(const char* msg= "No data", const char* stateTry= "No data", const char* stateMarked= "No data", const char* file ="No data", int line = 0, const char*  func= "No data");
+	AutomatonException(AutomatonException&);
 	~AutomatonException();
+
+	AutomatonException& operator=(const AutomatonException&);
+	
 	const char* getFile() const;
 	int getLine() const;
 	const char* getFunc() const;
 	const char* getStateTry() const;
 	const char* getStateMarked() const;
+	int setFile(char*);
+	int setLine(int);
+	int setFucn(char*);
+	int setStateTry(char*);
+	int setStateMarked(char*);
 
 	int print() const;
 private:
