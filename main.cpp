@@ -29,6 +29,7 @@ int main() {
 	//State* states = new State[2];
 
 	cin >> autom2;
+	
 	//int m;
 	//cin >> m;
 	//cout << m;

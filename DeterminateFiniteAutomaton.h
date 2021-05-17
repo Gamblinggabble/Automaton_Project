@@ -27,7 +27,7 @@ public:
 	T* getAlphabet() const;
 
 	int printAlphabet();
-	std::istream& fillDFAutomatonConsole(std::istream&);
+	std::istream& fillDFAutomaton(std::istream&);
 private:
 	T* alphabet;
 	unsigned alphabetSize;
@@ -44,8 +44,7 @@ private:
 
 template <typename T>
 std::istream& operator>>(std::istream& in, DFAutomaton<T>& rhs) {
-	rhs.fillDFAutomatonConsole(in);
-	return in;
+	return rhs.fillDFAutomaton(in);
 }
 
 //template <typename T>
@@ -317,11 +316,12 @@ T* DFAutomaton<T>::getAlphabet() const {
 }
 
 template<typename T>
-std::istream& DFAutomaton<T>::fillDFAutomatonConsole(std::istream& in) {
-	//брой състояния
+std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
+	//number of states
 	std::cout << "Please enter number of states: ";
 	in >> statesCnt;
-	//състоянията
+	
+	//states
 	if (states != nullptr) {
 		delete[] states;
 	}
@@ -331,40 +331,40 @@ std::istream& DFAutomaton<T>::fillDFAutomatonConsole(std::istream& in) {
 		in >> states[i];
 	}
 
-	//брой елементи в азбуката
+	//number of elements in the alphabet
 	std::cout << "Please enter number of symbols in the alphabet: ";
 	in >> alphabetSize;
-
-	//въвеждане на елементите на азбуката
+	
+	//enter elements of alphabet
 	if (alphabet != nullptr) {
 		delete[] alphabet;
 	}
 	alphabet = new T[alphabetSize];
-
+	
 	for (int i = 0; i < alphabetSize; i++) {
 		std::cout << "Please enter symbol number [" << i + 1 << "]: ";
 		in >> alphabet[i];
 	}
-
-	//изтриване на старата таблица и инициализация на transition table с новите данни
+	
+	//delete current transition table and initialize a new one with entered size values
 	if (transitionTable != nullptr) {
 		for (int i = 0; i < statesCnt; i++) {
 			delete[] transitionTable[i];
 		}
 		delete[] transitionTable;
 	}
-
+	
 	transitionTable = new State * [statesCnt];
 	for (int i = 0; i < statesCnt; i++) {
 		transitionTable[i] = new State[alphabetSize];
 	}
 
-	//TODO Въвеждаме transition table
+	//enter transition table
 	for (int i = 0; i < statesCnt; i++) {
 		for (int j = 0; j < alphabetSize; j++) {
 			std::cout << "Please enter (" << states[i] << "," << alphabet[j] << "): ";
 			in >> transitionTable[i][j];
-			//TODO Проверка на входа
+			//check the input
 			bool inputTransitionCheck = false;
 			while (!inputTransitionCheck) {
 				for (int k = 0; k < statesCnt; k++) {
@@ -380,8 +380,7 @@ std::istream& DFAutomaton<T>::fillDFAutomatonConsole(std::istream& in) {
 			}
 		}
 	}
-
-	//въвеждане на начално състояние
+	//enter entry state
 	std::cout << "Please enter an entry state: ";
 	in >> entryState;
 	bool stateFlag = false;
@@ -398,17 +397,17 @@ std::istream& DFAutomaton<T>::fillDFAutomatonConsole(std::istream& in) {
 		}
 	}
 
-	//въвеждане на брой крайни състояния
+	//enter number of final states
 	std::cout << "Please enter the number of final states: ";
 	in >> finalStatesCnt;
 
-	//изтриване на стария масив с крайни състояния и създаване на нов
+	//delete old final states array and create a new one
 	if (finalStates != nullptr) {
 		delete[] finalStates;
 	}
 	finalStates = new State[finalStatesCnt];
 
-	//въвеждане на крайните състояния
+	//enter final states
 	for (int i = 0; i < finalStatesCnt; i++) {
 		std::cout << "Enter final state number [" << i + 1 << "]: ";
 		in >> finalStates[i];
@@ -430,10 +429,5 @@ std::istream& DFAutomaton<T>::fillDFAutomatonConsole(std::istream& in) {
 	return in;
 }
 
-//TODO Simo
-//2filler
-//2predefined functions
-//TransitionTable
-//2predefined functions
 
 #endif

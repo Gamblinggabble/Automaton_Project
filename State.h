@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <cstring>
+#include <string>
+
+const unsigned MAX_NAME_LENGHT = 50;
 
 using std::cout;
 using std::cin;

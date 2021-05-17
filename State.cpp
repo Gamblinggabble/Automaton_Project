@@ -35,8 +35,16 @@ State::~State() {
 	}
 }
 
-std::ostream& operator<<(std::ostream& out, State& rhs) {
+std::ostream& operator<<(std::ostream& out, const State& rhs) {
 	out << rhs.getStateName();
 	return out;
+}
+
+std::istream& operator>>(std::istream& lhs, State& rhs)
+{
+	char arr[MAX_NAME_LENGHT];
+	lhs>>arr; //TODO Try with getline
+	rhs.setStateName(arr);
+	return lhs;
 }
 

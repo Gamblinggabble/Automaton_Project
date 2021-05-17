@@ -143,13 +143,11 @@
     <ClCompile Include="AutomatonException.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="State.cpp" />
-    <ClCompile Include="TransitionTable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutomatonException.h" />
     <ClInclude Include="DeterminateFiniteAutomaton.h" />
     <ClInclude Include="State.h" />
-    <ClInclude Include="TransitionTable.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
