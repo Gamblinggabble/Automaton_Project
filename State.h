@@ -17,17 +17,15 @@ public:
 	State& operator=(const State&);
 	~State();
 	int setStateName(char*);
-	char* getStateName()const;
+	char* getStateName() const;
 
 
 private:
 	
 	char* stateName;
-	
-
 };
 
-std::ostream& operator<<(std::ostream&,const State&);
+std::ostream& operator<<(std::ostream&, const State&);
 std::istream& operator>>(std::istream&, State&);
 
 #endif

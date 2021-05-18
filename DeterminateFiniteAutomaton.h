@@ -1,15 +1,16 @@
-#ifndef DF_AUTOMATON_H
+п»ї#ifndef DF_AUTOMATON_H
 #define DF_AUTOMATON_H
 
 #include "State.h"
 #include <iostream>
 #include <cstring>
+#include <fstream>
 
 template <typename T>
 class DFAutomaton
 {
 public:
-	DFAutomaton(unsigned alphabetSize = 0, T* alphabet = nullptr, unsigned statesCnt = 0, State* states = nullptr, const State& entryState = NULL,
+	DFAutomaton(unsigned alphabetSize = 0, T* alphabet = nullptr, unsigned statesCnt = 0, State* states = nullptr, const State& entryState = State("NoName"),
 		unsigned finalStatesCnt = 0, State* finalStates = nullptr);
 	DFAutomaton(const DFAutomaton&);
 	~DFAutomaton();
@@ -22,9 +23,13 @@ public:
 	unsigned getAlphabetSize() const;
 	unsigned getStatesCnt() const;
 
-	int printAlphabet();
+	int printAlphabet() const; //TODO: help func, could be deleted
+	std::ostream& ins(std::ostream&) const;
+	std::ofstream& ins(std::ofstream&) const;
 private:
 	T* alphabet;
+	//number of elements in the alphabet
+	//DISCLAMER! if T is of type char, \0 is not counted in alphabetSize
 	unsigned alphabetSize;
 
 	unsigned statesCnt;
@@ -36,6 +41,10 @@ private:
 	State* finalStates;
 };
 
+template<typename T>
+std::ostream& operator<<(std::ostream&, const DFAutomaton<T>&);
+template<typename T>
+std::ofstream& operator<<(std::ofstream&, const DFAutomaton<T>&);
 
 template <typename T>
 DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesCnt, State* states, const State& entryState,
@@ -45,16 +54,33 @@ DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesC
 {
 	if (alphabet != nullptr) {
 		this->alphabetSize = alphabetSize;
-		this->alphabet = new T[alphabetSize];
-		for (unsigned i = 0; i < alphabetSize; i++)
-		{
-			this->alphabet[i] = alphabet[i];
+		if (typeid(T) == typeid(char)) {
+			this->alphabet = new T[this->alphabetSize + 1];
+			// cannot use strcpy_s because a conversion from T* to char* is needed
+			for (unsigned i = 0; i <= this->alphabetSize; i++)
+			{
+				this->alphabet[i] = alphabet[i];
+			}
+		}
+		else {
+			this->alphabet = new T[this->alphabetSize];
+			for (unsigned i = 0; i < this->alphabetSize; i++)
+			{
+				this->alphabet[i] = alphabet[i];
+			}
 		}
 	}
 	else {
-		std::cout << "No alphabet entered! Default alphabet set - {0,1}" << std::endl;
-		this->alphabetSize = 2;
-		this->alphabet = new T[2]{ 0, 1 };
+		if (typeid(T) == typeid(char)) {
+			std::cout << "No alphabet entered! Default alphabet set - {a,b}" << std::endl;
+			this->alphabetSize = 2;
+			this->alphabet = new T[2]{ 'a', 'b' };
+		}
+		else {
+			std::cout << "No alphabet entered! Default alphabet set - {0,1}" << std::endl;
+			this->alphabetSize = 2;
+			this->alphabet = new T[2]{ 0, 1 };
+		}
 	}
 
 	if (states != nullptr) {
@@ -62,6 +88,8 @@ DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesC
 		{
 			this->states[i] = states[i];
 		}
+
+		this->entryState = entryState;
 
 		if (finalStates != nullptr) {
 			for (unsigned j = 0; j < this->finalStatesCnt; j++)
@@ -74,17 +102,25 @@ DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesC
 	else this->states = nullptr;
 }
 
-
 template <typename T>
 DFAutomaton<T>::DFAutomaton(const DFAutomaton<T>& rhs)
 	:statesCnt(rhs.statesCnt), states(new State[rhs.statesCnt]), entryState(rhs.entryState), finalStatesCnt(rhs.finalStatesCnt), finalStates(new State[rhs.finalStatesCnt])
 {
 	if (rhs.alphabet != nullptr) {
 		alphabetSize = rhs.alphabetSize;
-		alphabet = new T[alphabetSize];
-		for (unsigned i = 0; i < alphabetSize; i++)
-		{
-			alphabet[i] = rhs.alphabet[i];
+		if (typeid(T) == typeid(char)) {
+			alphabet = new T[alphabetSize + 1];
+			for (unsigned i = 0; i <= this->alphabetSize; i++)
+			{
+				this->alphabet[i] = rhs.alphabet[i];
+			}
+		}
+		else {
+			alphabet = new T[alphabetSize];
+			for (unsigned i = 0; i < alphabetSize; i++)
+			{
+				alphabet[i] = rhs.alphabet[i];
+			}
 		}
 	}
 	else {
@@ -97,6 +133,9 @@ DFAutomaton<T>::DFAutomaton(const DFAutomaton<T>& rhs)
 		{
 			this->states[i] = rhs.states[i];
 		}
+
+
+		entryState = rhs.entryState;
 
 		if (rhs.finalStates != nullptr) {
 			for (unsigned j = 0; j < this->finalStatesCnt; j++)
@@ -127,10 +166,19 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 	if (this != &rhs) {
 		if (rhs.alphabet != nullptr) {
 			alphabetSize = rhs.alphabetSize;
-			alphabet = new T[alphabetSize];
-			for (unsigned i = 0; i < alphabetSize; i++)
-			{
-				alphabet[i] = rhs.alphabet[i];
+			if (typeid(T) == typeid(char)) {
+				alphabet = new T[alphabetSize + 1];
+				for (unsigned i = 0; i <= this->alphabetSize; i++)
+				{
+					this->alphabet[i] = rhs.alphabet[i];
+				}
+			}
+			else {
+				alphabet = new T[alphabetSize];
+				for (unsigned i = 0; i < alphabetSize; i++)
+				{
+					alphabet[i] = rhs.alphabet[i];
+				}
 			}
 		}
 		if (rhs.states != nullptr) {
@@ -139,6 +187,8 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 			{
 				this->states[i] = rhs.states[i];
 			}
+			
+			entryState = rhs.entryState;
 
 			if (rhs.finalStates != nullptr) {
 				this->finalStatesCnt = rhs.finalStatesCnt;
@@ -162,7 +212,7 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 }
 
 template <typename T>
-int DFAutomaton<T>::printAlphabet() {
+int DFAutomaton<T>::printAlphabet() const  {
 	for (unsigned i = 0; i < alphabetSize; i++)
 	{
 		std::cout << alphabet[i] << " ";
@@ -170,27 +220,15 @@ int DFAutomaton<T>::printAlphabet() {
 	return 0;
 }
 
-/*В случай, че едно състояние на автомата е маркирано като начално е необходимо
-при опит да се маркира второ състояние за начално да се изхвърля и обработва изключение
-от потребителски дефиниран клас AutomatonException. Той наследява стандартния клас
-за изключения и предоставя механизми за описание на ред от кода, който предизвиква
-грешката, както и име на състоянието, което се опитваме да направим начално и име на
-състоянието, което вече е маркирано като начално.*/
-/*
-* Автоматът трябва да има член-функция, която ясно показва на потребителя текущото
-начално състояние и позволява то да се смени, като се размаркира като начално, а на негово
-място потребителят посочва ново начално състояние.
-*/
 template<typename T>
 int DFAutomaton<T>::setEntryState(char* name) {
-
+	entryState = State(name);
 	return 0;
 }
 
 template<typename T>
 int DFAutomaton<T>::setEntryState(State state) {
-
-
+	entryState = state;
 	return 0;
 }
 
@@ -207,6 +245,60 @@ unsigned DFAutomaton<T>::getAlphabetSize() const {
 template<typename T>
 unsigned DFAutomaton<T>::getStatesCnt() const {
 	return statesCnt;
+}
+
+template<typename T>
+std::ostream& DFAutomaton<T>::ins(std::ostream& out) const {
+
+	out << "Alphabet: "; 
+	for (unsigned i = 0; i < alphabetSize; i++)
+	{
+		out << alphabet[i] << " ";
+	}
+	out << std::endl;
+	out << "Transition table: "<< std::endl;
+	//TODO: print transition table
+	out << "Entry state: " << entryState.getStateName() << std::endl;
+	out << "Final state" << (finalStatesCnt > 1 ? "s" : "") << ": ";
+	for (unsigned i = 0; i < finalStatesCnt; i++)
+	{
+		out << finalStates[i] << " ";
+	}
+	out << std::endl;
+
+	return out;
+}
+
+template<typename T>
+std::ofstream& DFAutomaton<T>::ins(std::ofstream& fout) const {
+
+	fout << "Alphabet: "; 
+	for (unsigned i = 0; i < alphabetSize; i++)
+	{
+		fout << alphabet[i] << " ";
+	}
+	fout << std::endl;
+	fout << "Transition table: " << std::endl;
+	//TODO: print transition table
+	fout << "Entry state: " << entryState.getStateName() << std::endl;
+	fout << "Final state" << (finalStatesCnt>1?"s":"") << ": ";
+	for (unsigned i = 0; i < finalStatesCnt; i++)
+	{
+		fout << finalStates[i] << " ";
+	}
+	fout << std::endl;
+
+	return fout;
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& lhs, const DFAutomaton<T>& rhs) {
+	return rhs.ins(lhs);
+}
+
+template<typename T>
+std::ofstream& operator<<(std::ofstream& lhs, const DFAutomaton<T>& rhs) {
+	return rhs.ins(lhs);
 }
 
 #endif
