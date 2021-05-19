@@ -1,5 +1,5 @@
-#ifndef _AUTOMATONSTATEEXCEPTION_H
-#define _AUTOMATONSTATEEXCEPTION_H
+#ifndef _AUTOMATON_STATE_EXCEPTION_H
+#define _AUTOMATON_STATE_EXCEPTION_H
 
 #include <iostream>
 #include <exception>

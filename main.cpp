@@ -21,7 +21,6 @@ int main() {
 	
 	DFAutomaton <int> autom3;
 	input_file >> autom3;
-	cout << autom3.getEntryState();
 
 	input_file.close();
 	cout << autom3;
@@ -38,17 +37,19 @@ int main() {
 	cout << autom1.getEntryState().getStateName() << endl;*/
 
 	State s1;
+	cin >> s1;
+	cout << s1 << endl;
 	State s2("green");
 	s1 = s2;
 	autom1.setEntryState(s1);
-	cout << autom1.getEntryState().getStateName() << endl;
+	//cout << autom1.getEntryState().getStateName() << endl;
 	
-	ofstream of; of.open("file.out");
+	ofstream of;
+	of.open("file.out");
 	if (!of) {
 		cout << "Failed to open file.out" << endl;
 		return 1;
 	}
-	of << autom1;
 
 	DFAutomaton<int> autom2;
 	cin >> autom2;

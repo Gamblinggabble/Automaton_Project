@@ -2,10 +2,12 @@
 #define DF_AUTOMATON_H
 
 #include "State.h"
+#include "AutomatonStateException.h"
 #include <iostream>
 #include <cstring>
 #include <fstream>
 #include <iomanip> 
+#include <windows.h> 
 
 
 template <typename T>
@@ -30,10 +32,9 @@ public:
 	State* getStates() const;
 	T* getAlphabet() const;
 
-
-	int printAlphabet() const; //TODO: help func, could be deleted
-	void printTransitionTable(std::ostream& out) const;
-	void printTransitionTable(std::ofstream& out) const;
+	int printAlphabet() const; //TODO: check this func, could be deleted
+	int printTransitionTable(std::ostream& out) const;
+	int printTransitionTable(std::ofstream& out) const;
 	std::ostream& ins(std::ostream&) const;
 	std::ofstream& ins(std::ofstream&) const;
 	std::istream& fillDFAutomaton(std::istream&);
@@ -78,7 +79,7 @@ std::ifstream& operator>>(std::ifstream& in, DFAutomaton<T>& rhs) {
 template <typename T>
 DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesCnt, State* states, State** transitionTable,
 	const State& entryState, unsigned finalStatesCnt, State* finalStates)
-	:statesCnt(statesCnt), /*states(new State[statesCnt]),*/ entryState(entryState), finalStatesCnt(finalStatesCnt),
+	:statesCnt(statesCnt), entryState(entryState), finalStatesCnt(finalStatesCnt),
 	finalStates(new State[finalStatesCnt])
 {
 
@@ -101,16 +102,8 @@ DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesC
 		}
 	}
 	else {
-		if (typeid(T) == typeid(char)) {
-			std::cout << "No alphabet entered! Default alphabet set - {a,b}" << std::endl;
-			this->alphabetSize = 2;
-			this->alphabet = new T[2]{ 'a', 'b' };
-		}
-		else {
-			std::cout << "No alphabet entered! Default alphabet set - {0,1}" << std::endl;
-			this->alphabetSize = 2;
-			this->alphabet = new T[2]{ 0, 1 };
-		}
+		this->alphabetSize = 0;
+		this->alphabet = nullptr;
 	}
 
 	if (states != nullptr) {
@@ -266,6 +259,10 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 				}
 			}
 		}
+		else {
+			this->alphabetSize = 0;
+			this->alphabet = nullptr;
+		}
 		if (rhs.states != nullptr) {
 			this->statesCnt = rhs.statesCnt;
 			for (unsigned i = 0; i < this->statesCnt; i++)
@@ -357,7 +354,7 @@ unsigned DFAutomaton<T>::getStatesCnt() const {
 }
 
 template<typename T>
-void DFAutomaton<T>::printTransitionTable(std::ostream& out) const
+int DFAutomaton<T>::printTransitionTable(std::ostream& out) const
 {
 	if (transitionTable != nullptr) {
 		//finds the longest state name
@@ -370,7 +367,7 @@ void DFAutomaton<T>::printTransitionTable(std::ostream& out) const
 		SETW_PARAM += 2;
 
 		out << "Transition table: " << std::endl;
-		cout << std::setw(SETW_PARAM); cout << "\t";
+		cout << std::setw(SETW_PARAM) << "";
 		for (unsigned i = 0; i < alphabetSize; i++)
 		{
 			cout << std::setw(SETW_PARAM) << alphabet[i];
@@ -379,7 +376,7 @@ void DFAutomaton<T>::printTransitionTable(std::ostream& out) const
 		for (unsigned i = 0; i < statesCnt; i++)
 		{
 			cout << std::setw(SETW_PARAM) << states[i];
-			cout << '\t';
+			//cout << '\t';
 			for (unsigned j = 0; j < alphabetSize; j++)
 			{
 				cout << std::setw(SETW_PARAM) << transitionTable[i][j];
@@ -390,41 +387,28 @@ void DFAutomaton<T>::printTransitionTable(std::ostream& out) const
 	else {
 		out << "Transition table: not entered" << std::endl;
 	}
+	return 0;
 }
 template<typename T>
-void DFAutomaton<T>::printTransitionTable(std::ofstream& out) const {
+int DFAutomaton<T>::printTransitionTable(std::ofstream& out) const {
 
 	if (transitionTable != nullptr) {
-		//finds the longest state name
-		unsigned SETW_PARAM = strlen(states[0].getStateName());
-		for (unsigned i = 0; i < statesCnt; i++)
-		{
-			if (SETW_PARAM < strlen(states[i].getStateName()))
-				SETW_PARAM = strlen(states[i].getStateName());
-		}
-		SETW_PARAM += 2;
 
-		out << "Transition table: " << std::endl;
-		out << std::setw(SETW_PARAM); out << "\t";
-		for (unsigned i = 0; i < alphabetSize; i++)
-		{
-			out << std::setw(SETW_PARAM) << alphabet[i];
-		}
-		out << std::endl << std::endl;
 		for (unsigned i = 0; i < statesCnt; i++)
 		{
-			out << std::setw(SETW_PARAM) << states[i];
-			out << '\t';
 			for (unsigned j = 0; j < alphabetSize; j++)
 			{
-				out << std::setw(SETW_PARAM) << transitionTable[i][j];
+				out << transitionTable[i][j] << " ";
 			}
 			out << std::endl;
 		}
 	}
 	else {
+		//TODO: handle exception
+		//throw "Transition table : not entered";
 		out << "Transition table: not entered" << std::endl;
 	}
+	return 0;
 }
 
 template<typename T>
@@ -437,9 +421,11 @@ std::ostream& DFAutomaton<T>::ins(std::ostream& out) const {
 	}
 	out << std::endl;
 
+	out << std::endl;
 	printTransitionTable(out);
+	out << std::endl;
 
-	out << "Entry state: " << entryState.getStateName() << std::endl;
+	out << "Entry state: " << entryState << std::endl;
 	out << "Final state" << (finalStatesCnt == 1 ? "" : "s") << ": ";
 	if (finalStatesCnt == 0) out << "none";
 	for (unsigned i = 0; i < finalStatesCnt; i++)
@@ -451,23 +437,33 @@ std::ostream& DFAutomaton<T>::ins(std::ostream& out) const {
 	return out;
 }
 
-
-
 template<typename T>
 std::ofstream& DFAutomaton<T>::ins(std::ofstream& fout) const {
-
-	fout << "Alphabet: ";
-	for (unsigned i = 0; i < alphabetSize; i++)
+	//prints alphabet type char/int
+	fout << (typeid(T) == typeid(char) ? 2 : 1) << std::endl;
+	//prints states
+	fout << statesCnt;
+	for (unsigned i = 0; i < statesCnt; i++)
 	{
-		fout << alphabet[i] << " ";
+		fout << " " << states[i];
 	}
 	fout << std::endl;
+	//prints alphabet
+	fout << alphabetSize;
+	for (unsigned i = 0; i < alphabetSize; i++)
+	{
+		fout << " " << alphabet[i];
+	}
+	fout << std::endl;
+	//prints transition table
 	printTransitionTable(fout);
-	fout << "Entry state: " << entryState.getStateName() << std::endl;
-	fout << "Final state" << (finalStatesCnt > 1 ? "s" : "") << ": ";
+	//prints entry state
+	fout << entryState << std::endl;
+	//prints final states
+	fout << finalStatesCnt;
 	for (unsigned i = 0; i < finalStatesCnt; i++)
 	{
-		fout << finalStates[i] << " ";
+		fout << " " << finalStates[i];
 	}
 	fout << std::endl;
 
@@ -524,7 +520,7 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 		std::cout << "Please enter symbol number [" << i + 1 << "]: ";
 		in >> alphabet[i];
 	}
-	
+
 	//TODO: make it a separate setTransitionTable function
 	//delete current transition table and initialize a new one with entered size values
 	if (transitionTable != nullptr) {
@@ -541,23 +537,35 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 
 	//enter transition table
 	for (int i = 0; i < statesCnt; i++) {
-		for (int j = 0; j < alphabetSize; j++) {
-			std::cout << "Please enter (" << states[i] << "," << alphabet[j] << "): ";
-			in >> transitionTable[i][j];
+		for (int j = 0; j < alphabetSize; j++) {			
 			//check the input
 			bool inputTransitionCheck = false;
+
+			//TODO: use exception instead
 			while (!inputTransitionCheck) {
-				for (int k = 0; k < statesCnt; k++) {
-					if (strcmp(states[k].getStateName(), transitionTable[i][j].getStateName()) == 0) {
-						inputTransitionCheck = true;
-						break;
+				try {
+					std::cout << "Please enter (" << states[i] << "," << alphabet[j] << "): ";
+					in >> transitionTable[i][j];
+					for (int k = 0; k < statesCnt; k++) {
+						if (strcmp(states[k].getStateName(), transitionTable[i][j].getStateName()) == 0) {
+							inputTransitionCheck = true;
+							break;
+						}
+					}
+					if (!inputTransitionCheck) {
+						//TODO: handle exceptions
+						//throw AutomatonStateException("There isn't such a state in the current automaton.");
 					}
 				}
-				if (!inputTransitionCheck) {
-					std::cout << "There isn't such a state in the current automaton. Please enter another one: ";
-					in >> transitionTable[i][j];
+				catch (AutomatonStateException e) {
+					cout << e;
+					//MessageBox(0, L"State not found!", L"Exception", MB_OK);
+					//MessageBox::Show("Exception! State not found!");
+					std::cerr << "Exception! State: \"" << e.getStateNotFound().getStateName() << "\" not found!" << std::endl;
+					
 				}
 			}
+
 		}
 	}
 	//enter entry state
