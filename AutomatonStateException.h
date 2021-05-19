@@ -12,12 +12,15 @@ class AutomatonStateException :public std::exception {
 public:
 
 	AutomatonStateException(const State& stateNotFound, const char* file = "No data", const char* fn = "No data", unsigned line = 0);
+	AutomatonStateException(AutomatonStateException&);
 	~AutomatonStateException();
+
+	AutomatonStateException& operator=(const AutomatonStateException&);
 	const char* getFile() const;
 	const char* getFn() const;
 	const State& getStateNotFound() const;
 	unsigned getLine() const;
-	
+	//Dari TODO: add setters
 private:
 
 	char* file;

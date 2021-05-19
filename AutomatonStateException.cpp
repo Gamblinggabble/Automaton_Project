@@ -10,6 +10,51 @@ AutomatonStateException::AutomatonStateException(const State& stateNotFound, con
 	strcpy_s(this->fn, strlen(fn) + 1, fn);
 }
 
+AutomatonStateException::AutomatonStateException(AutomatonStateException& rhs) : std::exception(rhs) {
+	if (rhs.file != nullptr) {
+		if (file != nullptr) {
+			delete[] file;
+		}
+		file = new char[strlen(rhs.file) + 1];
+		strcpy_s(file, strlen(rhs.file) + 1, rhs.file);
+	}
+	else fn = nullptr;
+
+	if (rhs.fn != nullptr) {
+		if (fn != nullptr) {
+			delete[] fn;
+		}
+		fn = new char[strlen(rhs.fn) + 1];
+		strcpy_s(fn, strlen(rhs.fn) + 1, rhs.fn);
+	}
+	else fn = nullptr;
+
+}
+
+AutomatonStateException& AutomatonStateException::operator=(const AutomatonStateException& rhs) {
+	if (this != &rhs) {
+		if (rhs.file != nullptr) {
+			if (file != nullptr) {
+				delete[] file;
+			}
+			file = new char[strlen(rhs.file) + 1];
+			strcpy_s(file, strlen(rhs.file) + 1, rhs.file);
+		}
+		else fn = nullptr;
+		if (rhs.fn != nullptr) {
+			if (fn != nullptr) {
+				delete[] fn;
+			}
+			fn = new char[strlen(rhs.fn) + 1];
+			strcpy_s(fn, strlen(rhs.fn) + 1, rhs.fn);
+		}
+		else fn = nullptr;
+	}
+
+	return *this;
+}
+
+
 AutomatonStateException::~AutomatonStateException() {
 
 	if (file != nullptr) {
@@ -37,6 +82,7 @@ const State& AutomatonStateException::getStateNotFound() const {
 	return stateNotFound;
 };
 
+//Dari TODO: add setters
 
 std::ostream& operator <<(std::ostream& out, const AutomatonStateException& rhs) {
 	out << rhs.what() << std::endl;

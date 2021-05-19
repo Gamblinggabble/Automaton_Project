@@ -11,4 +11,7 @@
     <ClInclude Include="State.h" />
     <ClInclude Include="AutomatonException.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="file.in" />
+  </ItemGroup>
 </Project>
