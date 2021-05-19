@@ -5,12 +5,10 @@
 #include <cstring>
 #include <string>
 
-const unsigned MAX_NAME_LENGHT = 50;
+const unsigned MAX_NAME_LENGHT = 100;
 
 using std::cout;
 using std::cin;
-
-const unsigned MAX_LENGHT_NAME = 100;
 
 class State
 {

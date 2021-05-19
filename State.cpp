@@ -1,4 +1,6 @@
 #include "State.h"
+#include <iostream>
+#include <string>
 
 State::State(const char* name): stateName(new char[strlen(name)+1]) {
 	strcpy_s(stateName, strlen(name) + 1, name);
@@ -45,7 +47,12 @@ std::ostream& operator<<(std::ostream& out, const State& rhs) {
 std::istream& operator>>(std::istream& lhs, State& rhs)
 {
 	char arr[MAX_NAME_LENGHT];
-	lhs>>arr; //TODO Try with getline
+
+	//TODO Try with getline
+	/*lhs.ignore();
+	lhs.getline(arr, MAX_NAME_LENGHT);*/
+
+	lhs >> arr;
 	rhs.setStateName(arr);
 	return lhs;
 }
