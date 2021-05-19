@@ -151,6 +151,9 @@
     <ClInclude Include="DeterminateFiniteAutomaton.h" />
     <ClInclude Include="State.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="file.in" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

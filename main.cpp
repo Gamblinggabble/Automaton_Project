@@ -10,6 +10,21 @@ using namespace std;
 
 int main() {
 
+	ifstream input_file;
+	input_file.open("file.in");
+
+	if (!input_file) {
+		 //check if it is open correctly
+		cerr << "Could not open file file.n" << endl;
+		return 1;
+	}
+	
+	DFAutomaton <int> autom3;
+	input_file >> autom3;
+
+	input_file.close();
+	cout << autom3;
+	
 	char* arr = new char[6]{ 'a', 'b', 'c', 'd', 'e'};
 	//cout << arr << endl;
 	int arr1[] = {9, 1, 2, 3, 4};
@@ -43,5 +58,6 @@ int main() {
 	of << autom2;
 
 	of.close();
+
 	return 0;
 }
