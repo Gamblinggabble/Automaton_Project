@@ -9,7 +9,7 @@ template <typename T>
 class DFAutomaton
 {
 public:
-	DFAutomaton(unsigned alphabetSize = 0, T* alphabet = nullptr, unsigned statesCnt = 0, State* states = nullptr, State** = nullptr, const State& entryState = NULL,
+	DFAutomaton(unsigned alphabetSize = 0, T* alphabet = nullptr, unsigned statesCnt = 0, State* states = nullptr, State** = nullptr, const State& entryState = State("NoName"),
 		unsigned finalStatesCnt = 0, State* finalStates = nullptr);
 	DFAutomaton(const DFAutomaton&);
 	~DFAutomaton();
@@ -26,6 +26,7 @@ public:
 
 	int printAlphabet();
 	int fillDFAutomatonConsole();
+	std::ifstream& fillDFAutomaton(std::ifstream&);
 private:
 	T* alphabet;
 	unsigned alphabetSize;
@@ -42,7 +43,13 @@ private:
 
 template <typename T>
 std::istream& operator>>(std::istream& in, DFAutomaton<T>& rhs) {
-	rhs.fillDFAutomatonConsole();
+	rhs.fillDFAutomaton(in);
+	return in;
+}
+
+template <typename T>
+std::ifstream& operator>>(std::ifstream& in, DFAutomaton<T>& rhs) {
+	rhs.fillDFAutomaton(in);
 	return in;
 }
 
@@ -405,7 +412,111 @@ int DFAutomaton<T>::fillDFAutomatonConsole() {
 
 	return 0;
 }
+//-------------------Na dari potencilnite gluposti-------------------
+//template <typename T>
+//int fillDFAutomatonFile( ifstream& in);
+template<typename T>
+std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
+	//br sustoqnia
+    in >> statesCnt;
+	//samite sustoqnie
+	if (states != nullptr) {
+		delete[]states;
+	}
+	states = new State[statesCnt];
+	for (int i = 0; i < statesCnt; i++) {
+		in >> states[i];
+	}
 
+	//number of alphabet symbols
+	in >> alphabetSize;
+
+	//adding el from the alphabet
+	if (alphabet != nullptr) {
+		delete[] alphabet;
+	}
+	alphabet = new T[alphabetSize];
+
+	for (int i = 0; i < alphabetSize; i++) {
+		in >> alphabet[i];
+	}
+
+	//deleting the old TT and intializing TT with  new data
+	if (transitionTable != nullptr) {
+		for (int i = 0; i < statesCnt; i++) {
+			delete[] transitionTable[i];
+		}
+		delete[] transitionTable;
+	}
+
+	transitionTable = new State * [statesCnt];
+	for (int i = 0; i < statesCnt; i++) {
+		transitionTable[i] = new State[alphabetSize];
+	}
+
+	//TODO vuvejda se  transition table
+	for (int i = 0; i < statesCnt; i++) {
+		for (int j = 0; j < alphabetSize; j++) {
+			in >> transitionTable[i][j];
+			//TODO check the input
+			bool inputTransitionCheck = false;
+			while (!inputTransitionCheck) {
+				for (int k = 0; k < statesCnt; k++) {
+					if (strcmp(states[k].getStateName(), transitionTable[i][j].getStateName()) == 0) inputTransitionCheck = true;
+				}
+				if (!inputTransitionCheck) {
+					std::cout << "There isn't such a state in the current automaton. Corrupted Automaton!";
+					return in;
+				}
+			}
+		}
+	}
+
+	//add entry state
+	in >> entryState;
+	bool stateFlag = false;
+	while (!stateFlag) {
+		for (int h = 0; h < statesCnt; h++) {
+			if (strcmp(entryState.getStateName(), states[h].getStateName()) == 0) stateFlag = true;
+		}
+		if (!stateFlag) {
+			//TODO: handle exception or don't
+			std::cout << "Invalid entry state! Corrupted Automaton!";
+			return in;
+		}
+	}
+
+	//enter number of final states
+	
+	in >> finalStatesCnt;
+
+	//deletion of the old array with final states and creating new
+	if (finalStates != nullptr) {
+		delete[] finalStates;
+	}
+	finalStates = new State[finalStatesCnt];
+
+	//enter final states
+	for (int i = 0; i < finalStatesCnt; i++) {
+
+		in >> finalStates[i];
+		stateFlag = false;
+		while (!stateFlag) {
+			for (int h = 0; h < statesCnt; h++) {
+				if (strcmp(finalStates[i].getStateName(), states[h].getStateName()) == 0) stateFlag = true;
+			}
+			if (!stateFlag) {
+				//in case final state isn't a valid state
+				std::cout << "Invalid final state! Corrupted Automaton!";
+				return in;
+			}
+		}
+	}
+
+	return in;
+}
+
+//-------------------Krai na na dari potencilnite gluposti-------------------
 //TODO Simo
 //2filler
 //2predefined functions

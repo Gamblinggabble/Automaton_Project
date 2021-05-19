@@ -153,6 +153,9 @@
     <ClInclude Include="State.h" />
     <ClInclude Include="TransitionTable.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="file.in" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
