@@ -16,6 +16,7 @@ public:
 	State(const char* = "NoName");
 	State(const State&);
 	State& operator=(const State&);
+	bool operator==(const State&);
 	~State();
 	int setStateName(char*);
 	char* getStateName() const;
