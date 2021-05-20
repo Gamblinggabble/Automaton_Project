@@ -39,7 +39,7 @@ public:
 	std::ofstream& ins(std::ofstream&) const;
 	std::istream& fillDFAutomaton(std::istream&);
 	std::ifstream& fillDFAutomaton(std::ifstream&);
-
+	bool operator()(const char* word) const;
 private:
 	T* alphabet;
 	//number of elements in the alphabet
@@ -537,7 +537,7 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 
 	//enter transition table
 	for (int i = 0; i < statesCnt; i++) {
-		for (int j = 0; j < alphabetSize; j++) {			
+		for (int j = 0; j < alphabetSize; j++) {
 			//check the input
 			bool inputTransitionCheck = false;
 
@@ -562,7 +562,7 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 					//MessageBox(0, L"State not found!", L"Exception", MB_OK);
 					//MessageBox::Show("Exception! State not found!");
 					std::cerr << "Exception! State: \"" << e.getStateNotFound().getStateName() << "\" not found!" << std::endl;
-					
+
 				}
 			}
 
@@ -617,11 +617,11 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 	return in;
 }
 
-//TODO: in case look here Dari
+//TODO: in case look here Darihj
 template<typename T>
 std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
 	//br sustoqnia
-    in >> statesCnt;
+	in >> statesCnt;
 	//samite sustoqnie
 	if (states != nullptr) {
 		delete[]states;
@@ -690,7 +690,7 @@ std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
 	}
 
 	//enter number of final states
-	
+
 	in >> finalStatesCnt;
 
 	//deletion of the old array with final states and creating new
@@ -717,6 +717,48 @@ std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
 	}
 
 	return in;
+}
+template <typename T>
+bool DFAutomaton<T>::operator()(const char* word) const {
+	unsigned i = 0;
+	State currentState = entryState;
+	unsigned currentStateIndex = 0;
+
+	while (word[i] != '\0') {
+
+		bool isThere = false;
+		for (int a = 0; a < alphabetSize; a++) {
+
+			if (typeid(T) == typeid(char) && word[i] == alphabet[a]) {
+				isThere = true;
+				currentState = transitionTable[currentStateIndex][a];
+				break;
+			}
+			else if (typeid(T) == typeid(int) && (word[i] - '0') == alphabet[a]) {
+				isThere = true;
+				currentState = transitionTable[currentStateIndex][a];
+				break;
+			}
+		}
+		if (isThere) {
+			for (unsigned s = 0; s < statesCnt; s++) {
+				if (states[s] == currentState) {
+					currentStateIndex = s;
+					break;
+				}
+			}
+		}
+		else return false;
+
+		i++;
+	}
+	for (unsigned s = 0; s < finalStatesCnt; s++) {
+		if (currentState == finalStates[s]) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 #endif

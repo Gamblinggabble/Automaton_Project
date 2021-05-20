@@ -2,11 +2,11 @@
 #include <iostream>
 #include <string>
 
-State::State(const char* name): stateName(new char[strlen(name)+1]) {
+State::State(const char* name) : stateName(new char[strlen(name) + 1]) {
 	strcpy_s(stateName, strlen(name) + 1, name);
 }
 
-State::State(const State& rhs): stateName(new char[strlen(rhs.stateName) + 1]) {
+State::State(const State& rhs) : stateName(new char[strlen(rhs.stateName) + 1]) {
 	strcpy_s(stateName, strlen(rhs.stateName) + 1, rhs.stateName); // destination, number of el, source
 }
 
@@ -21,6 +21,13 @@ State& State::operator=(const State& rhs) {
 	return *this;
 }
 
+bool State::operator==(const State& rhs) {
+	if (strcmp(stateName, rhs.getStateName()) == 0)
+		return true;
+
+	return false;
+}
+
 int State::setStateName(char* name) {
 	if (stateName != nullptr) {
 		delete[] stateName;
@@ -33,7 +40,7 @@ char* State::getStateName() const {
 	return stateName;
 }
 
-State::~State() { 
+State::~State() {
 	if (stateName != nullptr) {
 		delete[] stateName;
 	}
