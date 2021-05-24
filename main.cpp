@@ -5,28 +5,29 @@
 #include "State.h"
 #include <cstdlib>
 #include <fstream>
+#include "Operations.h"
 
 using namespace std;
 
 int main() {
 
-	ifstream input_file;
-	input_file.open("file.in");
+	//ifstream input_file;
+	//input_file.open("file.in");
 
-	if (!input_file) {
-		 //check if it is open correctly
-		cerr << "Could not open file file.n" << endl;
-		return 1;
-	}
-	
-	DFAutomaton <int> autom3;
-	input_file >> autom3;
-	input_file.close();
+	//if (!input_file) {
+	//	 //check if it is open correctly
+	//	cerr << "Could not open file file.n" << endl;
+	//	return 1;
+	//}
 
-	cout << autom3;
+	//DFAutomaton <int> autom3;
+	//input_file >> autom3;
+	//input_file.close();
 
-	cout << boolalpha << autom3("001");
-	
+	//cout << autom3;
+
+	//cout << boolalpha << autom3("001");
+
 	//char* arr = new char[6]{ 'a', 'b', 'c', 'd', 'e'};
 	////cout << arr << endl;
 	//int arr1[] = {9, 1, 2, 3, 4};
@@ -60,6 +61,41 @@ int main() {
 	//of << autom2;
 
 	//of.close();
-	
+
+	//
+
+	DFAutomaton<char> autom4;
+	ifstream input_file_A;
+	input_file_A.open("automA.txt");
+
+	if (!input_file_A) {
+		//check if it is open correctly
+		cerr << "Could not open file file.n" << endl;
+		return 1;
+	}
+	input_file_A >> autom4;
+
+	input_file_A.close();
+
+
+
+	DFAutomaton<char> autom5;
+	ifstream input_file_B;
+	input_file_B.open("automB.txt");
+
+	if (!input_file_B) {
+		//check if it is open correctly
+		cerr << "Could not open file file.n" << endl;
+		return 1;
+	}
+	input_file_B >> autom5;
+
+	input_file_B.close();
+
+	cout << endl;
+	//cout << boolalpha << isAlphabetEqual(autom4, autom5) << noboolalpha << endl;
+	DFAutomaton<char> automProduct =  autom4&autom5;
+	cout << boolalpha << automProduct("2122");
+
 	return 0;
 }

@@ -149,9 +149,12 @@
     <ClInclude Include="AutomatonException.h" />
     <ClInclude Include="AutomatonStateException.h" />
     <ClInclude Include="DeterminateFiniteAutomaton.h" />
+    <ClInclude Include="Operations.h" />
     <ClInclude Include="State.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="automA.txt" />
+    <Text Include="AutomB.txt" />
     <Text Include="file.in" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
