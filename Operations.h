@@ -237,6 +237,54 @@ DFAutomaton<T> unionAutomaton(const DFAutomaton<T>& automA, const DFAutomaton<T>
 	tmpAutom.setFinalStates(tmpFinalStates);
 	return tmpAutom;
 }
+template <typename T>
+DFAutomaton<T> complementAutomaton(DFAutomaton<T>& complement,const DFAutomaton<T>& automA) {
+
+	DFAutomaton<T> tmpAutom;
+	
+	tmpAutom.setAlphabetSize(automA.getAlphabetSize());
+	tmpAutom.setAlphabet(automA.getAlphabet());
+	tmpAutom.setStatesCnt(automA.getStatesCnt());
+	tmpAutom.setStates(automA.getStates());
+	tmpAutom.setFinalStatesCnt(automA.getStatesCnt() - automA.getFinalStatesCnt());
+
+	State* tmpFinalStates = new State[tmpAutom.getFinalStatesCnt()];
+	unsigned cnt=0;
+	for (unsigned i = 0; i < automA.getStatesCnt(); i++) {
+		bool wasFinal = false;
+		for (unsigned j = 0; j < automA.getFinalStatesCnt(); j++)
+		{
+			if (automA.getStates()[i]==automA.getFinalStates()[j]) {
+				wasFinal = true;
+				break;
+			}
+		}
+		if (!wasFinal) {
+			tmpFinalStates[cnt] = automA.getStates()[i];
+			cnt++;
+		}
+	}
+	tmpAutom.setFinalStates(tmpFinalStates);
+
+	complement = tmpAutom;
+	return tmpAutom;
+}
+
+template<typename T>
+DFAutomaton<T> operator&(const DFAutomaton<T>& automA, const DFAutomaton<T>& automB) {
+	return intersectionAutomaton(automA, automB);
+}
+
+template<typename T>
+DFAutomaton<T> operator|(const DFAutomaton<T>& automA, const DFAutomaton<T>& automB) {
+	return unionAutomaton(automA, automB);
+}
+
+template<typename T>
+DFAutomaton<T> operator^(DFAutomaton<T>& complement,const DFAutomaton<T>& automA) {
+	return complementAutomaton(complement,automA);
+}
+
 
 template<typename T>
 bool isAlphabetEqual(const DFAutomaton<T>& automA, const DFAutomaton<T>& automB) {
@@ -265,11 +313,3 @@ bool isAlphabetEqual(const DFAutomaton<T>& automA, const DFAutomaton<T>& automB)
 	else return false;
 }
 
-template<typename T>
-DFAutomaton<T> operator&(const DFAutomaton<T>& automA, const DFAutomaton<T>& automB) {
-	return intersectionAutomaton(automA, automB);
-}
-template<typename T>
-DFAutomaton<T> operator|(const DFAutomaton<T>& automA, const DFAutomaton<T>& automB) {
-	return unionAutomaton(automA, automB);
-}
