@@ -81,12 +81,6 @@ std::ifstream& operator>>(std::ifstream& in, DFAutomaton<T>& rhs) {
 	return rhs.fillDFAutomaton(in);
 }
 
-//template <typename T>
-//std::ifstream& operator>>(std::ifstream& in, DFAutomaton<T>& rhs) {
-//	rhs.fillDFAutomatonFile(in);
-//	return in;
-//}
-
 template <typename T>
 DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesCnt, State* states, State** transitionTable,
 	const State& entryState, unsigned finalStatesCnt, State* finalStates)

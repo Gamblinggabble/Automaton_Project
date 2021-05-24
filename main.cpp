@@ -94,8 +94,9 @@ int main() {
 
 	cout << endl;
 	//cout << boolalpha << isAlphabetEqual(autom4, autom5) << noboolalpha << endl;
-	DFAutomaton<char> automProduct =  autom4&autom5;
-	cout << boolalpha << automProduct("2122");
+	DFAutomaton<char> automProduct =  autom4|autom5;
+	cout << automProduct;
+	//cout << boolalpha << automProduct("12");
 
 	return 0;
 }
