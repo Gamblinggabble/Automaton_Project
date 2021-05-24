@@ -249,6 +249,7 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 				{
 					this->alphabet[i] = rhs.alphabet[i];
 				}
+				alphabet[alphabetSize] = '\0';
 			}
 			else {
 				alphabet = new T[alphabetSize];
@@ -264,6 +265,10 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 		}
 		if (rhs.states != nullptr) {
 			this->statesCnt = rhs.statesCnt;
+			if (this->states != nullptr) {
+				delete[] this->states;
+			}
+			this->states = new State[this->statesCnt];
 			for (unsigned i = 0; i < this->statesCnt; i++)
 			{
 				this->states[i] = rhs.states[i];
@@ -273,6 +278,10 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 
 			if (rhs.finalStates != nullptr) {
 				this->finalStatesCnt = rhs.finalStatesCnt;
+				if (this->finalStates != nullptr) {
+					delete[] this->finalStates;
+				}
+				this->finalStates = new State[this->finalStatesCnt];
 				for (unsigned i = 0; i < this->finalStatesCnt; i++)
 				{
 					this->finalStates[i] = rhs.finalStates[i];
@@ -783,9 +792,18 @@ int DFAutomaton<T>::setAlphabet(T* alphabet) {
 	if (this->alphabet != nullptr) {
 		delete[] this->alphabet;
 	}
-	this->alphabet = new T[alphabetSize];
-	for (int i = 0; i < alphabetSize; i++) {
-		this->alphabet[i] = alphabet[i];
+	if (typeid(T)==typeid(char)) {
+		this->alphabet = new T[alphabetSize+1];
+		for (int i = 0; i < alphabetSize; i++) {
+			this->alphabet[i] = alphabet[i];
+		}
+		this->alphabet[alphabetSize] = '\0';
+	}
+	else {
+		this->alphabet = new T[alphabetSize];
+		for (int i = 0; i < alphabetSize; i++) {
+			this->alphabet[i] = alphabet[i];
+		}
 	}
 	return 0;
 }
