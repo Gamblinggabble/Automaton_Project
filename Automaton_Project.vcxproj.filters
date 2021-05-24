@@ -13,5 +13,10 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="file.in" />
+    <Text Include="automA.txt" />
+    <Text Include="AutomB.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Operations.h" />
   </ItemGroup>
 </Project>
