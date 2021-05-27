@@ -246,6 +246,7 @@ DFAutomaton<T> complementAutomaton(DFAutomaton<T>& complement,const DFAutomaton<
 	tmpAutom.setAlphabet(automA.getAlphabet());
 	tmpAutom.setStatesCnt(automA.getStatesCnt());
 	tmpAutom.setStates(automA.getStates());
+	tmpAutom.setEntryState(automA.getEntryState());
 	tmpAutom.setFinalStatesCnt(automA.getStatesCnt() - automA.getFinalStatesCnt());
 
 	State* tmpFinalStates = new State[tmpAutom.getFinalStatesCnt()];
@@ -265,6 +266,7 @@ DFAutomaton<T> complementAutomaton(DFAutomaton<T>& complement,const DFAutomaton<
 		}
 	}
 	tmpAutom.setFinalStates(tmpFinalStates);
+	tmpAutom.setTransitionTable(automA.getTransitionTable());
 
 	complement = tmpAutom;
 	return tmpAutom;

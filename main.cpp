@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include "AutomatonException.h"
 #include "DeterminateFiniteAutomaton.h"
@@ -11,58 +10,56 @@ using namespace std;
 
 int main() {
 
-	//ifstream input_file;
-	//input_file.open("file.in");
+	/* ifstream input_file;
+	input_file.open("file.in");
 
-	//if (!input_file) {
-	//	 //check if it is open correctly
-	//	cerr << "Could not open file file.n" << endl;
-	//	return 1;
-	//}
+	if (!input_file) {
+		 //check if it is open correctly
+		cerr << "Could not open file file.n" << endl;
+		return 1;
+	}
 
-	//DFAutomaton <int> autom3;
-	//input_file >> autom3;
-	//input_file.close();
+	DFAutomaton <int> autom3;
+	input_file >> autom3;
+	input_file.close();
 
-	//cout << autom3;
+	cout << autom3;
 
-	//cout << boolalpha << autom3("001");
+	cout << boolalpha << autom3("001");
 
-	//char* arr = new char[6]{ 'a', 'b', 'c', 'd', 'e'};
-	////cout << arr << endl;
-	//int arr1[] = {9, 1, 2, 3, 4};
-	//DFAutomaton<char> autom1(6, arr, 3, new State[3]{ State("q0"), State("q1"), State("q2") }, nullptr, State("q0"), 1,  new State[1]{ State("q2")});
-	//DFAutomaton<int> autom;// = DFAutomaton<int>(5, arr1);
+	char* arr = new char[6]{ 'a', 'b', 'c', 'd', 'e'};
+	//cout << arr << endl;
+	int arr1[] = {9, 1, 2, 3, 4};
+	DFAutomaton<char> autom1(6, arr, 3, new State[3]{ State("q0"), State("q1"), State("q2") }, nullptr, State("q0"), 1,  new State[1]{ State("q2")});
+	DFAutomaton<int> autom;// = DFAutomaton<int>(5, arr1);
 
-	///*autom1.printAlphabet(); cout << endl;
+	/*autom1.printAlphabet(); cout << endl;
+	cout << autom1.getEntryState().getStateName() << endl;
+	autom1.setEntryState("gabii");
+	cout << autom1.getEntryState().getStateName() << endl;
+
+	State s1;
+	cin >> s1;
+	cout << s1 << endl;
+	State s2("green");
+	s1 = s2;
+	autom1.setEntryState(s1);
 	//cout << autom1.getEntryState().getStateName() << endl;
-	//autom1.setEntryState("gabii");
-	//cout << autom1.getEntryState().getStateName() << endl;*/
+	
+	ofstream of;
+	of.open("file.out");
+	if (!of) {
+		cout << "Failed to open file.out" << endl;
+		return 1;
+	}
 
-	//State s1;
-	//cin >> s1;
-	//cout << s1 << endl;
-	//State s2("green");
-	//s1 = s2;
-	//autom1.setEntryState(s1);
-	////cout << autom1.getEntryState().getStateName() << endl;
-	//
-	//ofstream of;
-	//of.open("file.out");
-	//if (!of) {
-	//	cout << "Failed to open file.out" << endl;
-	//	return 1;
-	//}
+	DFAutomaton<int> autom2;
+	cin >> autom2;
+	cout << endl;
+	cout << autom2;
+	of << autom2;
 
-	//DFAutomaton<int> autom2;
-	//cin >> autom2;
-	//cout << endl;
-	//cout << autom2;
-	//of << autom2;
-
-	//of.close();
-
-	//
+	of.close();*/
 
 	DFAutomaton<char> autom4;
 	ifstream input_file_A;
@@ -70,13 +67,11 @@ int main() {
 
 	if (!input_file_A) {
 		//check if it is open correctly
-		cerr << "Could not open file file.n" << endl;
+		cerr << "Could not open file automA.txt" << endl;
 		return 1;
 	}
 	input_file_A >> autom4;
-
 	input_file_A.close();
-
 
 
 	DFAutomaton<char> autom5;
@@ -85,11 +80,10 @@ int main() {
 
 	if (!input_file_B) {
 		//check if it is open correctly
-		cerr << "Could not open file file.n" << endl;
+		cerr << "Could not open file automB.txt" << endl;
 		return 1;
 	}
 	input_file_B >> autom5;
-
 	input_file_B.close();
 
 	cout << endl;
@@ -97,9 +91,11 @@ int main() {
 	//DFAutomaton<char> automProduct =  autom4|autom5;
 	//cout << automProduct;
 	//cout << boolalpha << automProduct("12");
+
+
 	DFAutomaton<char> autom7;
 	//operator^(autom7,autom5);
-	autom7^ autom5;
-	cout << autom5 << endl << endl << autom7;
+	autom7^autom4;
+	cout << autom4 << endl << endl << autom7;
 	return 0;
 }

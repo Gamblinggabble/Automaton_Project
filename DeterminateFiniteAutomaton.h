@@ -16,32 +16,31 @@ class DFAutomaton
 public:
 	DFAutomaton(unsigned alphabetSize = 0, T* alphabet = nullptr, unsigned statesCnt = 0, State* states = nullptr, State** = nullptr, const State& entryState = State("NoName"),
 		unsigned finalStatesCnt = 0, State* finalStates = nullptr);
+	DFAutomaton(const DFAutomaton&);
+	~DFAutomaton();
+	DFAutomaton& operator=(const DFAutomaton&);
 
 	template <typename T> friend  std::istream& operator>>(std::istream&, DFAutomaton<T>&);
 
-	DFAutomaton(const DFAutomaton&);
-	~DFAutomaton();
-
-	DFAutomaton& operator=(const DFAutomaton&);
-
-	//Simo - added setStatesCnt and setStates
-	int setStatesCnt(unsigned);
-	int setStates(State*);
-	int setEntryState(char*);
-	int setAlphabet(T*);
-	int setAlphabetSize(unsigned);
-	int setTransitionTable(State**);
-	int setEntryState(State);
-	int setFinalStatesCnt(unsigned);
-	int setFinalStates(State*);
-	State* getFinalStates() const;
-	unsigned getFinalStatesCnt() const;
-	State** getTransitionTable() const;
-	State getEntryState() const;
 	unsigned getAlphabetSize() const;
+	T* getAlphabet() const;
+	State getEntryState() const;
 	unsigned getStatesCnt() const;
 	State* getStates() const;
-	T* getAlphabet() const;
+	unsigned getFinalStatesCnt() const;
+	State* getFinalStates() const;
+	State** getTransitionTable() const;
+
+	int setAlphabetSize(unsigned);
+	int setAlphabet(T*);
+	int setEntryState(char*);
+	int setEntryState(State);
+	int setStatesCnt(unsigned);
+	int setStates(State*);
+	int setFinalStatesCnt(unsigned);
+	int setFinalStates(State*);
+	int setTransitionTable(State**);
+
 
 	int printAlphabet() const; //TODO: check this func, could be deleted
 	int printTransitionTable(std::ostream& out) const;
@@ -56,15 +55,14 @@ private:
 	//number of elements in the alphabet
 	//DISCLAMER! if T is of type char, \0 is not counted in alphabetSize
 	unsigned alphabetSize;
-
 	unsigned statesCnt;
 	State* states;
-	State** transitionTable;
 	//only one entry state can exist
 	State entryState;
 	//zero or more finalStates
 	unsigned finalStatesCnt;
 	State* finalStates;
+	State** transitionTable;
 };
 
 template<typename T>
@@ -72,22 +70,17 @@ std::ostream& operator<<(std::ostream&, const DFAutomaton<T>&);
 template<typename T>
 std::ofstream& operator<<(std::ofstream&, const DFAutomaton<T>&);
 template <typename T>
-std::istream& operator>>(std::istream& in, DFAutomaton<T>& rhs) {
-	return rhs.fillDFAutomaton(in);
-}
-
+std::istream& operator>>(std::istream&, DFAutomaton<T>&);
 template <typename T>
-std::ifstream& operator>>(std::ifstream& in, DFAutomaton<T>& rhs) {
-	return rhs.fillDFAutomaton(in);
-}
+std::ifstream& operator>>(std::ifstream&, DFAutomaton<T>&);
 
+
+//Big five
 template <typename T>
 DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesCnt, State* states, State** transitionTable,
 	const State& entryState, unsigned finalStatesCnt, State* finalStates)
-	:statesCnt(statesCnt), entryState(entryState), finalStatesCnt(finalStatesCnt),
-	finalStates(new State[finalStatesCnt])
+	:statesCnt(statesCnt), finalStatesCnt(finalStatesCnt), entryState(entryState)
 {
-
 	if (alphabet != nullptr) {
 		this->alphabetSize = alphabetSize;
 		if (typeid(T) == typeid(char)) {
@@ -112,20 +105,14 @@ DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesC
 	}
 
 	if (states != nullptr) {
-		//added
-		if (this->states != nullptr) {
-			delete[]this->states;
-		}
 		this->states = new State[statesCnt];
-
 		for (unsigned i = 0; i < this->statesCnt; i++)
 		{
 			this->states[i] = states[i];
 		}
 
-		this->entryState = entryState;
-
 		if (finalStates != nullptr) {
+			finalStates = new State[finalStatesCnt];
 			for (unsigned j = 0; j < this->finalStatesCnt; j++)
 			{
 				this->finalStates[j] = finalStates[j];
@@ -133,19 +120,21 @@ DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesC
 		}
 		else this->finalStates = nullptr;
 	}
-	else this->states = nullptr;
+	else {
+		this->states = nullptr;
+		this->finalStates = nullptr;
+	}
 
-
-	//�������� �� transition table
+	//set transition table
 	if (transitionTable != nullptr) {
-		//�����������
+		//create transition table
 		this->transitionTable = new State * [this->statesCnt];
-		for (int i = 0; i < this->statesCnt; i++) {
+		for (unsigned i = 0; i < this->statesCnt; i++) {
 			this->transitionTable[i] = new State[this->alphabetSize];
 		}
-		//��������������/ �������� �� ����������
-		for (int r = 0; r < this->statesCnt; r++) {
-			for (int c = 0; c < this->alphabetSize; c++) {
+		//fill transition table
+		for (unsigned r = 0; r < this->statesCnt; r++) {
+			for (unsigned c = 0; c < this->alphabetSize; c++) {
 				this->transitionTable[r][c] = transitionTable[r][c];
 			}
 		}
@@ -155,7 +144,7 @@ DFAutomaton<T>::DFAutomaton(unsigned alphabetSize, T* alphabet, unsigned statesC
 
 template <typename T>
 DFAutomaton<T>::DFAutomaton(const DFAutomaton<T>& rhs)
-	:statesCnt(rhs.statesCnt), states(new State[rhs.statesCnt]), entryState(rhs.entryState), finalStatesCnt(rhs.finalStatesCnt), finalStates(new State[rhs.finalStatesCnt])
+	:statesCnt(rhs.statesCnt), states(new State[rhs.statesCnt]), entryState(rhs.entryState), finalStatesCnt(rhs.finalStatesCnt)
 {
 	if (rhs.alphabet != nullptr) {
 		alphabetSize = rhs.alphabetSize;
@@ -185,31 +174,37 @@ DFAutomaton<T>::DFAutomaton(const DFAutomaton<T>& rhs)
 			this->states[i] = rhs.states[i];
 		}
 
-
 		entryState = rhs.entryState;
 
 		if (rhs.finalStates != nullptr) {
+			finalStates = new State[rhs.finalStatesCnt];
 			for (unsigned j = 0; j < this->finalStatesCnt; j++)
 			{
 				this->finalStates[j] = rhs.finalStates[j];
 			}
 		}
-		else this->finalStates = nullptr;
+		else {
+			this->finalStatesCnt = 0;
+			this->finalStates = nullptr;
+		}
 	}
-	else this->states = nullptr;
+	else {
+		this->statesCnt = 0;
+		this->states = nullptr;
+	}
 
-	//�������� �� transition table
-	//��������� ���� �� ��������� �� ������� ������ ���, ������ ����� ������������� ���� ��������
+	//set transition table
 	if (rhs.transitionTable != nullptr) {
-	
+
+		//create transition table
 		transitionTable = new State * [statesCnt];
-		for (int i = 0; i < statesCnt; i++) {
+		for (unsigned i = 0; i < statesCnt; i++) {
 			transitionTable[i] = new State[alphabetSize];
 		}
 
-		//�������� ���������� �� ��������� �� ������ ������� � ��������� �� ������
-		for (int r = 0; r < statesCnt; r++) {
-			for (int c = 0; c < alphabetSize; c++) {
+		//fill transition table
+		for (unsigned r = 0; r < statesCnt; r++) {
+			for (unsigned c = 0; c < alphabetSize; c++) {
 				transitionTable[r][c] = rhs.transitionTable[r][c];
 			}
 		}
@@ -229,9 +224,8 @@ DFAutomaton<T>::~DFAutomaton() {
 		delete[] states;
 	}
 
-	//��������� transition table
 	if (transitionTable != nullptr) {
-		for (int i = 0; i < statesCnt; i++) {
+		for (unsigned i = 0; i < statesCnt; i++) {
 			delete[] transitionTable[i];
 		}
 		delete[] transitionTable;
@@ -241,7 +235,13 @@ DFAutomaton<T>::~DFAutomaton() {
 template <typename T>
 DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 	if (this != &rhs) {
+		//set alphabet
 		if (rhs.alphabet != nullptr) {
+
+			if (alphabet != nullptr) {
+				delete[] this->alphabet;
+			}
+
 			alphabetSize = rhs.alphabetSize;
 			if (typeid(T) == typeid(char)) {
 				alphabet = new T[alphabetSize + 1];
@@ -263,6 +263,8 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 			this->alphabetSize = 0;
 			this->alphabet = nullptr;
 		}
+
+		//set states
 		if (rhs.states != nullptr) {
 			this->statesCnt = rhs.statesCnt;
 			if (this->states != nullptr) {
@@ -297,29 +299,31 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 			this->states = nullptr;
 		}
 
-		//�������� �� transition table
+		//set transition table
 		if (rhs.transitionTable != nullptr) {
-			//����� ������� �������
-			for (int i = 0; i < statesCnt; i++) {
-				delete[] transitionTable[i];
-			}
-			delete[] transitionTable;
+			//delete if initialized
+			if (transitionTable != nullptr) {
 
-			//��������� ����
+				for (unsigned i = 0; i < statesCnt; i++) {
+					delete[] transitionTable[i];
+				}
+				delete[] transitionTable;
+			}
+
+			//create new
 			transitionTable = new State * [statesCnt];
-			for (int i = 0; i < statesCnt; i++) {
+			for (unsigned i = 0; i < statesCnt; i++) {
 				transitionTable[i] = new State[alphabetSize];
 			}
 
-			//�������� ���������� �� ��������� �� ������ ������� � ��������� �� ������
-			for (int r = 0; r < statesCnt; r++) {
-				for (int c = 0; c < alphabetSize; c++) {
+			//fill transitionTable
+			for (unsigned r = 0; r < statesCnt; r++) {
+				for (unsigned c = 0; c < alphabetSize; c++) {
 					transitionTable[r][c] = rhs.transitionTable[r][c];
 				}
 			}
 		}
 		else transitionTable = nullptr;
-
 	}
 
 	return *this;
@@ -334,33 +338,129 @@ int DFAutomaton<T>::printAlphabet() const {
 	return 0;
 }
 
+
+//getters
+template<typename T>
+unsigned DFAutomaton<T>::getAlphabetSize() const {
+	return alphabetSize;
+}
+template<typename T>
+T* DFAutomaton<T>::getAlphabet() const {
+	return alphabet;
+}
+template<typename T>
+State DFAutomaton<T>::getEntryState() const {
+	return entryState;
+}
+template<typename T>
+unsigned DFAutomaton<T>::getStatesCnt() const {
+	return statesCnt;
+}
+template<typename T>
+State* DFAutomaton<T>::getStates() const {
+	return states;
+}
+template<typename T>
+unsigned DFAutomaton<T>::getFinalStatesCnt() const {
+	return finalStatesCnt;
+}
+template<typename T>
+State* DFAutomaton<T>::getFinalStates() const {
+	return finalStates;
+}
+template<typename T>
+State** DFAutomaton<T>::getTransitionTable() const {
+	return transitionTable;
+}
+
+//setters
+template<typename T>
+int DFAutomaton<T>::setAlphabetSize(unsigned alphabetSize) {
+	this->alphabetSize = alphabetSize;
+	return 0;
+}
+template<typename T>
+int DFAutomaton<T>::setAlphabet(T* alphabet) {
+	if (this->alphabet != nullptr) {
+		delete[] this->alphabet;
+	}
+	if (typeid(T) == typeid(char)) {
+		this->alphabet = new T[alphabetSize + 1];
+		for (unsigned i = 0; i < alphabetSize; i++) {
+			this->alphabet[i] = alphabet[i];
+		}
+		this->alphabet[alphabetSize] = '\0';
+	}
+	else {
+		this->alphabet = new T[alphabetSize];
+		for (unsigned i = 0; i < alphabetSize; i++) {
+			this->alphabet[i] = alphabet[i];
+		}
+	}
+	return 0;
+}
 template<typename T>
 int DFAutomaton<T>::setEntryState(char* name) {
 	entryState = State(name);
 	return 0;
 }
-
 template<typename T>
 int DFAutomaton<T>::setEntryState(State state) {
 	entryState = state;
 	return 0;
 }
-
 template<typename T>
-State DFAutomaton<T>::getEntryState() const {
-	return entryState;
+int DFAutomaton<T>::setStatesCnt(unsigned number) {
+	statesCnt = number;
+	return 0;
+}
+template<typename T>
+int DFAutomaton<T>::setStates(State* states) {
+	if (this->states != nullptr) {
+		delete[] this->states;
+	}
+	this->states = new State[statesCnt];
+	for (unsigned i = 0; i < statesCnt; i++) {
+		this->states[i] = states[i];
+	}
+	return 0;
+}
+template<typename T>
+int DFAutomaton<T>::setFinalStatesCnt(unsigned finalStatesCnt) {
+	this->finalStatesCnt = finalStatesCnt;
+	return 0;
+}
+template<typename T>
+int DFAutomaton<T>::setFinalStates(State* finalStates) {
+	if (this->finalStates != nullptr) {
+		delete[] this->finalStates;
+	}
+	this->finalStates = new State[finalStatesCnt];
+	for (unsigned i = 0; i < finalStatesCnt; i++) {
+		this->finalStates[i] = finalStates[i];
+	}
+	return 0;
+}
+template<typename T>
+int DFAutomaton<T>::setTransitionTable(State** transitionTable) {
+	if (this->transitionTable != nullptr) {
+		for (unsigned i = 0; i < statesCnt; i++) {
+			delete[] this->transitionTable[i];
+		}
+		delete[] this->transitionTable;
+	}
+	this->transitionTable = new State * [statesCnt];
+	for (unsigned i = 0; i < statesCnt; i++) {
+		this->transitionTable[i] = new State[alphabetSize];
+		for (unsigned j = 0; j < alphabetSize; j++) {
+			this->transitionTable[i][j] = transitionTable[i][j];
+		}
+	}
+	return 0;
 }
 
-template<typename T>
-unsigned DFAutomaton<T>::getAlphabetSize() const {
-	return alphabetSize;
-}
 
-template<typename T>
-unsigned DFAutomaton<T>::getStatesCnt() const {
-	return statesCnt;
-}
-
+//printing functions
 template<typename T>
 int DFAutomaton<T>::printTransitionTable(std::ostream& out) const
 {
@@ -418,7 +518,6 @@ int DFAutomaton<T>::printTransitionTable(std::ofstream& out) const {
 	}
 	return 0;
 }
-
 template<typename T>
 std::ostream& DFAutomaton<T>::ins(std::ostream& out) const {
 
@@ -444,7 +543,6 @@ std::ostream& DFAutomaton<T>::ins(std::ostream& out) const {
 
 	return out;
 }
-
 template<typename T>
 std::ofstream& DFAutomaton<T>::ins(std::ofstream& fout) const {
 	//prints alphabet type char/int
@@ -477,27 +575,16 @@ std::ofstream& DFAutomaton<T>::ins(std::ofstream& fout) const {
 
 	return fout;
 }
-
 template<typename T>
 std::ostream& operator<<(std::ostream& lhs, const DFAutomaton<T>& rhs) {
 	return rhs.ins(lhs);
 }
-
 template<typename T>
 std::ofstream& operator<<(std::ofstream& lhs, const DFAutomaton<T>& rhs) {
 	return rhs.ins(lhs);
 }
 
-template<typename T>
-State* DFAutomaton<T>::getStates() const {
-	return states;
-}
-
-template<typename T>
-T* DFAutomaton<T>::getAlphabet() const {
-	return alphabet;
-}
-
+//inserting functions
 template<typename T>
 std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 	//number of states
@@ -624,18 +711,17 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 
 	return in;
 }
-
-//TODO: in case look here Darihj
 template<typename T>
 std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
+	//TODO: in case look here Darihj
 	//br sustoqnia
 	in >> statesCnt;
-	//samite sustoqnie
+	//samite sustoqniq
 	if (states != nullptr) {
 		delete[]states;
 	}
 	states = new State[statesCnt];
-	for (int i = 0; i < statesCnt; i++) {
+	for (unsigned i = 0; i < statesCnt; i++) {
 		in >> states[i];
 	}
 
@@ -648,31 +734,31 @@ std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
 	}
 	alphabet = new T[alphabetSize];
 
-	for (int i = 0; i < alphabetSize; i++) {
+	for (unsigned i = 0; i < alphabetSize; i++) {
 		in >> alphabet[i];
 	}
 
 	//deleting the old TT and intializing TT with  new data
 	if (transitionTable != nullptr) {
-		for (int i = 0; i < statesCnt; i++) {
+		for (unsigned i = 0; i < statesCnt; i++) {
 			delete[] transitionTable[i];
 		}
 		delete[] transitionTable;
 	}
 
 	transitionTable = new State * [statesCnt];
-	for (int i = 0; i < statesCnt; i++) {
+	for (unsigned i = 0; i < statesCnt; i++) {
 		transitionTable[i] = new State[alphabetSize];
 	}
 
 	//insert transition table
-	for (int i = 0; i < statesCnt; i++) {
-		for (int j = 0; j < alphabetSize; j++) {
+	for (unsigned i = 0; i < statesCnt; i++) {
+		for (unsigned j = 0; j < alphabetSize; j++) {
 			in >> transitionTable[i][j];
 			//check the input
 			bool inputTransitionCheck = false;
 			while (!inputTransitionCheck) {
-				for (int k = 0; k < statesCnt; k++) {
+				for (unsigned k = 0; k < statesCnt; k++) {
 					if (strcmp(states[k].getStateName(), transitionTable[i][j].getStateName()) == 0) inputTransitionCheck = true;
 				}
 				if (!inputTransitionCheck) {
@@ -687,7 +773,7 @@ std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
 	in >> entryState;
 	bool stateFlag = false;
 	while (!stateFlag) {
-		for (int h = 0; h < statesCnt; h++) {
+		for (unsigned h = 0; h < statesCnt; h++) {
 			if (strcmp(entryState.getStateName(), states[h].getStateName()) == 0) stateFlag = true;
 		}
 		if (!stateFlag) {
@@ -708,12 +794,12 @@ std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
 	finalStates = new State[finalStatesCnt];
 
 	//enter final states
-	for (int i = 0; i < finalStatesCnt; i++) {
+	for (unsigned i = 0; i < finalStatesCnt; i++) {
 
 		in >> finalStates[i];
 		stateFlag = false;
 		while (!stateFlag) {
-			for (int h = 0; h < statesCnt; h++) {
+			for (unsigned h = 0; h < statesCnt; h++) {
 				if (strcmp(finalStates[i].getStateName(), states[h].getStateName()) == 0) stateFlag = true;
 			}
 			if (!stateFlag) {
@@ -726,6 +812,17 @@ std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
 
 	return in;
 }
+template <typename T>
+std::istream& operator>>(std::istream& in, DFAutomaton<T>& rhs) {
+	return rhs.fillDFAutomaton(in);
+}
+template <typename T>
+std::ifstream& operator>>(std::ifstream& in, DFAutomaton<T>& rhs) {
+	return rhs.fillDFAutomaton(in);
+}
+
+
+//reading a word
 template <typename T>
 bool DFAutomaton<T>::operator()(const char* word) const {
 	unsigned i = 0;
@@ -769,101 +866,6 @@ bool DFAutomaton<T>::operator()(const char* word) const {
 	return false;
 }
 
-template<typename T>
-int DFAutomaton<T>::setStatesCnt(unsigned number) {
-	statesCnt = number;
-	return 0;
-}
-
-template<typename T>
-int DFAutomaton<T>::setStates(State* states) {
-	if (this->states != nullptr) {
-		delete[] this->states;
-	}
-	this->states = new State[statesCnt];
-	for (int i = 0; i < statesCnt; i++) {
-		this->states[i] = states[i];
-	}
-	return 0;
-}
-
-template<typename T>
-int DFAutomaton<T>::setAlphabet(T* alphabet) {
-	if (this->alphabet != nullptr) {
-		delete[] this->alphabet;
-	}
-	if (typeid(T)==typeid(char)) {
-		this->alphabet = new T[alphabetSize+1];
-		for (int i = 0; i < alphabetSize; i++) {
-			this->alphabet[i] = alphabet[i];
-		}
-		this->alphabet[alphabetSize] = '\0';
-	}
-	else {
-		this->alphabet = new T[alphabetSize];
-		for (int i = 0; i < alphabetSize; i++) {
-			this->alphabet[i] = alphabet[i];
-		}
-	}
-	return 0;
-}
-
-template<typename T>
-int DFAutomaton<T>::setTransitionTable(State** transitionTable) {
-	if (this->transitionTable != nullptr) {
-		for (int i = 0; i < statesCnt; i++) {
-			delete[] this->transitionTable[i];
-		}
-		delete[] this->transitionTable;
-	}
-	this->transitionTable = new State * [statesCnt];
-	for (int i = 0; i < statesCnt; i++) {
-		this->transitionTable[i] = new State[alphabetSize];
-		for (int j = 0; j < alphabetSize; j++) {
-			this->transitionTable[i][j] = transitionTable[i][j];
-		}
-	}
-	return 0;
-}
-
-template<typename T>
-State** DFAutomaton<T>::getTransitionTable() const {
-	return transitionTable;
-}
-
-template<typename T>
-int DFAutomaton<T>::setFinalStatesCnt(unsigned finalStatesCnt) {
-	this->finalStatesCnt = finalStatesCnt;
-	return 0;
-}
-
-template<typename T>
-int DFAutomaton<T>::setFinalStates(State* finalStates) {
-	if (this->finalStates != nullptr) {
-		delete[] this->finalStates;
-	}
-	this->finalStates = new State[finalStatesCnt];
-	for (int i = 0; i < finalStatesCnt; i++) {
-		this->finalStates[i] = finalStates[i];
-	}
-	return 0;
-}
-
-template<typename T>
-unsigned DFAutomaton<T>::getFinalStatesCnt() const {
-	return finalStatesCnt;
-}
-
-template<typename T>
-State* DFAutomaton<T>::getFinalStates() const {
-	return finalStates;
-}
-
-template<typename T>
-int DFAutomaton<T>::setAlphabetSize(unsigned alphabetSize) {
-	this->alphabetSize = alphabetSize;
-	return 0;
-}
 
 
 #endif

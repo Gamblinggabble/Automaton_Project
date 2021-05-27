@@ -154,8 +154,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="automA.txt" />
-    <Text Include="AutomB.txt" />
     <Text Include="file.in" />
+    <Text Include="automB.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

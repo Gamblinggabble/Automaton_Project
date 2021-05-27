@@ -14,7 +14,7 @@
   <ItemGroup>
     <Text Include="file.in" />
     <Text Include="automA.txt" />
-    <Text Include="AutomB.txt" />
+    <Text Include="automB.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Operations.h" />
