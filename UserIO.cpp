@@ -128,7 +128,6 @@ int printEntryState(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar) {
 	return 0;
 }
 int changeEntryState(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar) {
-	//TODO: what if new entry state does not exist in states
 
 	cout << "Enter the name of the new entry state: ";
 	char newStateName[MAX_NAME_LENGHT];
