@@ -140,15 +140,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AutomatonStateException.cpp" />
-    <ClCompile Include="DeterminateFiniteAutomaton.cpp" />
     <ClCompile Include="AutomatonException.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="UserIO.cpp" />
     <ClCompile Include="State.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutomatonException.h" />
     <ClInclude Include="AutomatonStateException.h" />
     <ClInclude Include="DeterminateFiniteAutomaton.h" />
+    <ClInclude Include="UserIO.h" />
     <ClInclude Include="Operations.h" />
     <ClInclude Include="State.h" />
   </ItemGroup>
