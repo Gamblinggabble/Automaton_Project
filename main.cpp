@@ -61,41 +61,46 @@ int main() {
 
 	of.close();*/
 
-	DFAutomaton<char> autom4;
-	ifstream input_file_A;
-	input_file_A.open("automA.txt");
+	//DFAutomaton<char> autom4;
+	//ifstream input_file_A;
+	//input_file_A.open("automA.txt");
 
-	if (!input_file_A) {
-		//check if it is open correctly
-		cerr << "Could not open file automA.txt" << endl;
-		return 1;
-	}
-	input_file_A >> autom4;
-	input_file_A.close();
-
-
-	DFAutomaton<char> autom5;
-	ifstream input_file_B;
-	input_file_B.open("automB.txt");
-
-	if (!input_file_B) {
-		//check if it is open correctly
-		cerr << "Could not open file automB.txt" << endl;
-		return 1;
-	}
-	input_file_B >> autom5;
-	input_file_B.close();
-
-	cout << endl;
-	//cout << boolalpha << isAlphabetEqual(autom4, autom5) << noboolalpha << endl;
-	//DFAutomaton<char> automProduct =  autom4|autom5;
-	//cout << automProduct;
-	//cout << boolalpha << automProduct("12");
+	//if (!input_file_A) {
+	//	//check if it is open correctly
+	//	cerr << "Could not open file automA.txt" << endl;
+	//	return 1;
+	//}
+	//input_file_A >> autom4;
+	//input_file_A.close();
 
 
-	DFAutomaton<char> autom7;
-	//operator^(autom7,autom5);
-	autom7^autom4;
-	cout << autom4 << endl << endl << autom7;
+	//DFAutomaton<char> autom5;
+	//ifstream input_file_B;
+	//input_file_B.open("automB.txt");
+
+	//if (!input_file_B) {
+	//	//check if it is open correctly
+	//	cerr << "Could not open file automB.txt" << endl;
+	//	return 1;
+	//}
+	//input_file_B >> autom5;
+	//input_file_B.close();
+
+	//cout << endl;
+	////cout << boolalpha << isAlphabetEqual(autom4, autom5) << noboolalpha << endl;
+	////DFAutomaton<char> automProduct =  autom4|autom5;
+	////cout << automProduct;
+	////cout << boolalpha << automProduct("12");
+
+
+	//DFAutomaton<char> autom7;
+	////operator^(autom7,autom5);
+	//autom7^autom4;
+	//cout << autom4 << endl << endl << autom7;
+
+	DFAutomaton<int> autom8;
+	cout << "Enter autom8: " << endl;
+	cin >> autom8;
+
 	return 0;
 }

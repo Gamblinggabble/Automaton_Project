@@ -3,12 +3,16 @@
 
 #include "State.h"
 #include "AutomatonStateException.h"
+#include "AutomatonException.h"
 #include <iostream>
 #include <cstring>
 #include <fstream>
+#include <sstream>
+#include <string>
 #include <iomanip> 
 #include <windows.h> 
 
+const unsigned STATE_NAME_SIZE = 31;
 
 template <typename T>
 class DFAutomaton
@@ -42,7 +46,6 @@ public:
 	int setTransitionTable(State**);
 
 
-	int printAlphabet() const; //TODO: check this func, could be deleted
 	int printTransitionTable(std::ostream& out) const;
 	int printTransitionTable(std::ofstream& out) const;
 	std::ostream& ins(std::ostream&) const;
@@ -329,16 +332,6 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 	return *this;
 }
 
-template <typename T>
-int DFAutomaton<T>::printAlphabet() const {
-	for (unsigned i = 0; i < alphabetSize; i++)
-	{
-		std::cout << alphabet[i] << " ";
-	}
-	return 0;
-}
-
-
 //getters
 template<typename T>
 unsigned DFAutomaton<T>::getAlphabetSize() const {
@@ -401,9 +394,50 @@ int DFAutomaton<T>::setAlphabet(T* alphabet) {
 }
 template<typename T>
 int DFAutomaton<T>::setEntryState(char* name) {
-	entryState = State(name);
+	//entryState = State(name);
+	int i = 0;
+	char nameInput[STATE_NAME_SIZE];
+	char leftInput[STATE_NAME_SIZE];
+	while (name[i] != ' ' && name[i] != '\0') {
+		nameInput[i] = name[i];
+		i++;
+	}
+	nameInput[i] = '\0';
+	bool isLeft = false;
+	int k = 0;
+	while (name[i] != '\0') {
+		isLeft = true;
+		if (name[i] != ' ') {
+			leftInput[k] = name[i];
+			k++;
+			if (name[i + 1] == ' ') break;
+		}
+		i++;
+	}
+	leftInput[k] = '\0';
+
+	bool stateFlag = false;
+	for (int k = 0; k < statesCnt; k++) {
+		if (strcmp(nameInput, states[k].getStateName()) == 0) {
+			stateFlag = true;
+			entryState = State(nameInput);
+			break;
+		}
+	}
+	if (!stateFlag) {
+		AutomatonStateException stateNotExist(State(nameInput), __FILE__, __FUNCTION__, __LINE__);
+		throw stateNotExist;
+	}
+	if (isLeft) {
+		AutomatonException onlyOneState("Exception: Only one entry state could be entered!", leftInput, entryState.getStateName(), __FILE__, __LINE__, __FUNCTION__);
+		throw onlyOneState;
+	}
+
+	//q1 q2 q3
 	return 0;
 }
+
+
 template<typename T>
 int DFAutomaton<T>::setEntryState(State state) {
 	entryState = state;
@@ -512,8 +546,6 @@ int DFAutomaton<T>::printTransitionTable(std::ofstream& out) const {
 		}
 	}
 	else {
-		//TODO: handle exception
-		//throw "Transition table : not entered";
 		out << "Transition table: not entered" << std::endl;
 	}
 	return 0;
@@ -636,7 +668,6 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 			//check the input
 			bool inputTransitionCheck = false;
 
-			//TODO: use exception instead
 			while (!inputTransitionCheck) {
 				try {
 					std::cout << "Please enter (" << states[i] << "," << alphabet[j] << "): ";
@@ -648,37 +679,44 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 						}
 					}
 					if (!inputTransitionCheck) {
-						//TODO: handle exceptions
-						//throw AutomatonStateException("There isn't such a state in the current automaton.");
+						AutomatonStateException eTT(transitionTable[i][j], __FILE__, __FUNCTION__, __LINE__);
+						throw eTT;
 					}
 				}
-				catch (AutomatonStateException e) {
-					cout << e;
-					//MessageBox(0, L"State not found!", L"Exception", MB_OK);
-					//MessageBox::Show("Exception! State not found!");
-					std::cerr << "Exception! State: \"" << e.getStateNotFound().getStateName() << "\" not found!" << std::endl;
-
+				catch (AutomatonStateException eTT) {
+					cout << eTT;
 				}
 			}
-
 		}
 	}
 	//enter entry state
 	std::cout << "Please enter an entry state: ";
-	in >> entryState;
-	bool stateFlag = false;
-	while (!stateFlag) {
-		for (int k = 0; k < statesCnt; k++) {
-			if (strcmp(entryState.getStateName(), states[k].getStateName()) == 0) {
-				stateFlag = true;
-				break;
-			}
+	//in >> entryState;
+	bool isStateAlright = false;
+		char input[STATE_NAME_SIZE];
+		//in.clear();
+		char dummy[STATE_NAME_SIZE];
+		in.getline(dummy, STATE_NAME_SIZE);
+		//in.ignore();
+		in.getline(input, STATE_NAME_SIZE);
+	while (!isStateAlright) {
+		try {
+			setEntryState(input);
+			isStateAlright = true;
 		}
-		if (!stateFlag) {
-			std::cout << "You can't enter this entry state, because there isn't such a state in the current automaton. Please enter another one: ";
-			in >> entryState;
+		catch (AutomatonStateException ex1) {
+			std::cout << ex1;
+			std::cout << std::endl;
+			std::cout << "Please enter another entry state: ";
+			in.getline(input, STATE_NAME_SIZE);
+		}
+		catch (AutomatonException ex2) {
+			std::cout << ex2;
+			std::cout << std::endl;
+			break;
 		}
 	}
+
 
 	//enter number of final states
 	std::cout << "Please enter the number of final states: ";
@@ -694,17 +732,29 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 	for (int i = 0; i < finalStatesCnt; i++) {
 		std::cout << "Enter final state number [" << i + 1 << "]: ";
 		in >> finalStates[i];
-		stateFlag = false;
+		bool stateFlag = false;
 		while (!stateFlag) {
-			for (int k = 0; k < statesCnt; k++) {
-				if (strcmp(finalStates[i].getStateName(), states[k].getStateName()) == 0) {
-					stateFlag = true;
-					break;
+			try {
+				for (int k = 0; k < statesCnt; k++) {
+					if (strcmp(finalStates[i].getStateName(), states[k].getStateName()) == 0) {
+						stateFlag = true;
+						break;
+					}
+				}
+				if (!stateFlag) {
+					//std::cout << "You can't enter this final state, because there isn't such a state in the current automaton. Please enter another one: ";
+					//in >> finalStates[i];
+					AutomatonStateException stateEx1(finalStates[i], __FILE__, __FUNCTION__, __LINE__);
+					throw stateEx1;
+					//? confused about which function to call - copy constructor or constructor with parameters
 				}
 			}
-			if (!stateFlag) {
-				std::cout << "You can't enter this final state, because there isn't such a state in the current automaton. Please enter another one: ";
+			catch (AutomatonStateException stateEx) {
+				std::cout << std::endl;
+				cout << stateEx;
+				std::cout << "Please enter another state: ";
 				in >> finalStates[i];
+				//изтрива състояние
 			}
 		}
 	}
@@ -713,10 +763,9 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 }
 template<typename T>
 std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
-	//TODO: in case look here Darihj
-	//br sustoqnia
+	//number of states
 	in >> statesCnt;
-	//samite sustoqniq
+	//the states
 	if (states != nullptr) {
 		delete[]states;
 	}
@@ -779,7 +828,8 @@ std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
 		if (!stateFlag) {
 			//TODO: handle exception or don't
 			std::cout << "Invalid entry state! Corrupted Automaton!";
-			return in;
+			in.close();
+			exit(0);
 		}
 	}
 
