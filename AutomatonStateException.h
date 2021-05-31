@@ -10,12 +10,13 @@
 class AutomatonStateException :public std::exception {
 
 public:
-
+	AutomatonStateException();
 	AutomatonStateException(const State& stateNotFound, const char* file = "No data", const char* fn = "No data", unsigned line = 0);
 	AutomatonStateException(AutomatonStateException&);
-	~AutomatonStateException();
+	virtual ~AutomatonStateException();
 
 	AutomatonStateException& operator=(const AutomatonStateException&);
+	const char* what() const noexcept;
 	const char* getFile() const;
 	const char* getFn() const;
 	const State& getStateNotFound() const;

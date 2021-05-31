@@ -17,11 +17,8 @@ AutomatonException::AutomatonException(const char* msg, const char* stateTry, co
 	strcpy_s(this->func, strlen(func) + 1, func);
 }
 
-AutomatonException::AutomatonException(AutomatonException& rhs): std::exception(rhs) {
+AutomatonException::AutomatonException(const AutomatonException& rhs): std::exception(rhs) {
 		if (rhs.file != nullptr) {
-			if (file != nullptr) {
-				delete[] file;
-			}
 			file = new char[strlen(rhs.file) + 1];
 			strcpy_s(file, strlen(rhs.file) + 1, rhs.file);
 		}
@@ -30,27 +27,20 @@ AutomatonException::AutomatonException(AutomatonException& rhs): std::exception(
 		line = rhs.line;
 
 		if (rhs.func != nullptr) {
-			if (func != nullptr) {
-				delete[] func;
-			}
 			func = new char[strlen(rhs.func) + 1];
 			strcpy_s(func, strlen(rhs.func) + 1, rhs.func);
 		}
 		else func = nullptr;
 
 		if (rhs.stateTry != nullptr) {
-			if (stateTry != nullptr) {
-				delete[] stateTry;
-			}
+
 			stateTry = new char[strlen(rhs.stateTry) + 1];
 			strcpy_s(stateTry, strlen(rhs.stateTry) + 1, rhs.stateTry);
 		}
 		else stateTry = nullptr;
 
 		if (rhs.stateMarked != nullptr) {
-			if (stateMarked != nullptr) {
-				delete [] stateMarked;
-			}
+
 			stateMarked = new char[strlen(rhs.stateMarked) + 1];
 			strcpy_s(stateMarked, strlen(rhs.stateMarked) + 1, rhs.stateMarked);
 		}
@@ -182,11 +172,14 @@ int AutomatonException::print() const {
 }
 
 std::ostream& operator<<(std::ostream& out, AutomatonException& rhs) {
+	out << std::endl;
+	out << "------------------------------------------------------------------------" << std::endl;
 	out << rhs.what() << std::endl;
 	out << "Wanted entry state: " << rhs.getStateTry() << std::endl;
 	out << "Current entry state: " << rhs.getStateMarked() << std::endl;
 	out << "In file: " << rhs.getFile() << std::endl;
 	out << "Function: " << rhs.getFunc() << std::endl;
 	out << "Line: " << rhs.getLine() << std::endl;
+	out << "------------------------------------------------------------------------" << std::endl;
 	return out;
 }

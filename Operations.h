@@ -28,9 +28,9 @@ DFAutomaton<T> intersectionAutomaton(const DFAutomaton<T>& automA, const DFAutom
 		tmpAutom.setAlphabet(tmpAlphabet);
 	}
 	else {
-		throw "Automatons do not hace common alphabets.";
+		std::cout << "Automatons do not have common alphabets.";
+		return automA;
 	}
-	//TODO catch the exception
 
 	//set number of states
 	unsigned numberOfStates = automA.getStatesCnt() * automB.getStatesCnt();
@@ -142,9 +142,9 @@ DFAutomaton<T> unionAutomaton(const DFAutomaton<T>& automA, const DFAutomaton<T>
 		tmpAutom.setAlphabet(tmpAlphabet);
 	}
 	else {
-		throw "Automatons do not hace common alphabets.";
+		std::cout << "Automatons do not have common alphabets.";
+		return automA;
 	}
-	//TODO catch the exception
 
 	//set number of states
 	unsigned numberOfStates = automA.getStatesCnt() * automB.getStatesCnt();
