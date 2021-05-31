@@ -211,7 +211,7 @@ int readWord(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar) {
 
 	std::cout << "Please enter word: ";
 	char word[WORD_MAX_LEN];
-	std::cin.getline(word, WORD_MAX_LEN); //TODO: beware of getline
+	std::cin.getline(word, WORD_MAX_LEN);
 	std::cin >> word;
 	bool read;
 	if (workingWithIntAutom) {
@@ -221,13 +221,14 @@ int readWord(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar) {
 		read = automChar(word);
 	}
 
+	std::cout << std::endl;
 	if (read) {
 		std::cout << "The word EXISTS in the language of the automaton! :)";
 	}
 	else {
 		std::cout << "The word DOES NOT EXIST in the language of the automaton! :(";
 	}
-	std::cout << std::endl;
+	std::cout << std::endl << std::endl;
 
 	return 0;
 }
