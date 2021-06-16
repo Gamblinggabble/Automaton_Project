@@ -14,6 +14,25 @@
 
 const unsigned STATE_NAME_SIZE = 31;
 
+template<typename T>
+char* cleanCharArr(const char* source) {
+	//help function removing the error throwing symbols in char arrays
+	unsigned h = 0;
+	unsigned sz = strlen(source);
+	char* product = new char[sz + 1];
+	for (unsigned m = 0; m < sz; m++)
+	{
+		if ((source[m] >= 'a' && source[m] <= 'z') // a-z
+			|| (source[m] >= 'A' && source[m] <= 'Z') // A-Z
+			|| (source[m] >= '0' && source[m] <= '9')) // 0-9
+		{
+			product[h++] = source[m];
+		}
+	}
+	product[h] = '\0';
+	return product;
+}
+
 template <typename T>
 class DFAutomaton
 {
@@ -154,10 +173,11 @@ DFAutomaton<T>::DFAutomaton(const DFAutomaton<T>& rhs)
 		alphabetSize = rhs.alphabetSize;
 		if (typeid(T) == typeid(char)) {
 			alphabet = new T[alphabetSize + 1];
-			for (unsigned i = 0; i <= this->alphabetSize; i++)
+			for (unsigned i = 0; i < this->alphabetSize; i++)
 			{
 				this->alphabet[i] = rhs.alphabet[i];
 			}
+			alphabet[alphabetSize] = '\0';
 		}
 		else {
 			alphabet = new T[alphabetSize];
@@ -239,7 +259,7 @@ DFAutomaton<T>::~DFAutomaton() {
 template <typename T>
 DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 	if (this != &rhs) {
-		//delete transition table if initialized
+		// delete transition table if initialized
 		//!!!must be done here, before changing the value of statesCnt
 		if (transitionTable != nullptr) {
 			for (unsigned i = 0; i < statesCnt; i++) {
@@ -259,7 +279,7 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 			alphabetSize = rhs.alphabetSize;
 			if (typeid(T) == typeid(char)) {
 				alphabet = new T[alphabetSize + 1];
-				for (unsigned i = 0; i <= this->alphabetSize; i++)
+				for (unsigned i = 0; i < this->alphabetSize; i++)
 				{
 					this->alphabet[i] = rhs.alphabet[i];
 				}
@@ -315,7 +335,7 @@ DFAutomaton<T>& DFAutomaton<T>::operator=(const DFAutomaton<T>& rhs) {
 
 		//set transition table
 		if (rhs.transitionTable != nullptr) {
-			
+
 			//create new
 			transitionTable = new State * [statesCnt];
 			for (unsigned i = 0; i < statesCnt; i++) {
@@ -420,7 +440,7 @@ int DFAutomaton<T>::setEntryState(char* name) {
 	leftInput[k] = '\0';
 
 	bool stateFlag = false;
-	for (int k = 0; k < statesCnt; k++) {
+	for (unsigned k = 0; k < statesCnt; k++) {
 		if (strcmp(nameInput, states[k].getStateName()) == 0) {
 			stateFlag = true;
 			entryState = State(nameInput);
@@ -443,7 +463,7 @@ int DFAutomaton<T>::setEntryState(char* name) {
 
 template<typename T>
 int DFAutomaton<T>::setEntryState(State state) {
-	entryState = state;
+	setEntryState(state.getStateName());
 	return 0;
 }
 template<typename T>
@@ -621,17 +641,17 @@ std::ofstream& operator<<(std::ofstream& lhs, const DFAutomaton<T>& rhs) {
 //inserting functions
 template<typename T>
 std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
-	
+
 	//delete current transition table
 	// !!! must be done here, before changing the value of statesCnt
 	if (transitionTable != nullptr) {
-		for (int i = 0; i < statesCnt; i++) {
+		for (unsigned i = 0; i < statesCnt; i++) {
 			delete[] transitionTable[i];
 		}
 		delete[] transitionTable;
 		transitionTable = nullptr;
 	}
-	
+
 	//number of states
 	std::cout << "Please enter number of states: ";
 	in >> statesCnt;
@@ -654,23 +674,35 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 	if (alphabet != nullptr) {
 		delete[] alphabet;
 	}
-	alphabet = new T[alphabetSize];
+	if (typeid(T) == typeid(char)) {
+		alphabet = new T[alphabetSize + 1];
 
-	for (int i = 0; i < alphabetSize; i++) {
-		std::cout << "Please enter symbol number [" << i + 1 << "]: ";
-		in >> alphabet[i];
+		for (unsigned i = 0; i < alphabetSize; i++) {
+			std::cout << "Please enter symbol number [" << i + 1 << "]: ";
+			in >> alphabet[i];
+		}
+		alphabet[alphabetSize] = '\0';
+	}
+	else {
+
+		alphabet = new T[alphabetSize];
+
+		for (unsigned i = 0; i < alphabetSize; i++) {
+			std::cout << "Please enter symbol number [" << i + 1 << "]: ";
+			in >> alphabet[i];
+		}
 	}
 
 
 	//initialize a new transition table with entered size values
 	transitionTable = new State * [statesCnt];
-	for (int i = 0; i < statesCnt; i++) {
+	for (unsigned i = 0; i < statesCnt; i++) {
 		transitionTable[i] = new State[alphabetSize];
 	}
 
 	//enter transition table
-	for (int i = 0; i < statesCnt; i++) {
-		for (int j = 0; j < alphabetSize; j++) {
+	for (unsigned i = 0; i < statesCnt; i++) {
+		for (unsigned j = 0; j < alphabetSize; j++) {
 			//check the input
 			bool inputTransitionCheck = false;
 
@@ -678,7 +710,7 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 				try {
 					std::cout << "Please enter (" << states[i] << "," << alphabet[j] << "): ";
 					in >> transitionTable[i][j];
-					for (int k = 0; k < statesCnt; k++) {
+					for (unsigned k = 0; k < statesCnt; k++) {
 						if (strcmp(states[k].getStateName(), transitionTable[i][j].getStateName()) == 0) {
 							inputTransitionCheck = true;
 							break;
@@ -699,12 +731,12 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 	std::cout << "Please enter an entry state: ";
 	//in >> entryState;
 	bool isStateAlright = false;
-		char input[STATE_NAME_SIZE];
-		//in.clear();
-		char dummy[STATE_NAME_SIZE];
-		in.getline(dummy, STATE_NAME_SIZE);
-		//in.ignore();
-		in.getline(input, STATE_NAME_SIZE);
+	char input[STATE_NAME_SIZE];
+	//in.clear();
+	char dummy[STATE_NAME_SIZE];
+	in.getline(dummy, STATE_NAME_SIZE);
+	//in.ignore();
+	in.getline(input, STATE_NAME_SIZE);
 	while (!isStateAlright) {
 		try {
 			setEntryState(input);
@@ -735,13 +767,13 @@ std::istream& DFAutomaton<T>::fillDFAutomaton(std::istream& in) {
 	finalStates = new State[finalStatesCnt];
 
 	//enter final states
-	for (int i = 0; i < finalStatesCnt; i++) {
+	for (unsigned i = 0; i < finalStatesCnt; i++) {
 		std::cout << "Enter final state number [" << i + 1 << "]: ";
 		in >> finalStates[i];
 		bool stateFlag = false;
 		while (!stateFlag) {
 			try {
-				for (int k = 0; k < statesCnt; k++) {
+				for (unsigned k = 0; k < statesCnt; k++) {
 					if (strcmp(finalStates[i].getStateName(), states[k].getStateName()) == 0) {
 						stateFlag = true;
 						break;
@@ -797,13 +829,23 @@ std::ifstream& DFAutomaton<T>::fillDFAutomaton(std::ifstream& in) {
 	if (alphabet != nullptr) {
 		delete[] alphabet;
 	}
-	alphabet = new T[alphabetSize];
 
-	for (unsigned i = 0; i < alphabetSize; i++) {
-		in >> alphabet[i];
+	if (typeid(T) == typeid(char)) {
+		alphabet = new T[alphabetSize + 1];
+
+		for (unsigned i = 0; i < alphabetSize; i++) {
+			in >> alphabet[i];
+		}
+		alphabet[alphabetSize] = '\0';
+	}
+	else {
+		alphabet = new T[alphabetSize];
+
+		for (unsigned i = 0; i < alphabetSize; i++) {
+			in >> alphabet[i];
+		}
 	}
 
-	
 	//reserving space for the TT
 	transitionTable = new State * [statesCnt];
 	for (unsigned i = 0; i < statesCnt; i++) {
@@ -892,7 +934,7 @@ bool DFAutomaton<T>::operator()(char* word) const {
 	while (word[i] != '\0') {
 
 		bool isThere = false;
-		for (int a = 0; a < alphabetSize; a++) {
+		for (unsigned a = 0; a < alphabetSize; a++) {
 
 			if (typeid(T) == typeid(char) && word[i] == alphabet[a]) {
 				isThere = true;
@@ -926,6 +968,7 @@ bool DFAutomaton<T>::operator()(char* word) const {
 	return false;
 }
 
+
 //SVG creator 
 template<typename T>
 std::string DFAutomaton<T>::produceSvg() const {
@@ -934,13 +977,17 @@ std::string DFAutomaton<T>::produceSvg() const {
 	dotParser << "node[shape=doublecircle];%20";
 	for (unsigned i = 0; i < finalStatesCnt; i++)
 	{
-		dotParser << finalStates[i].getStateName() << "%20";
+		char* tmp = cleanCharArr<T>(finalStates[i].getStateName());
+		dotParser << tmp << "%20";
+		if (tmp != nullptr) delete[] tmp;
 	}
 	dotParser << "%0Anode[shape=circle];%0A";
 	//color of entry state node: lightgreen
 	//dotParser << entryState.getStateName() << "[style=filled,fillcolor=lightgreen];%0A";
 	//color of entry state node: lightblue
-	dotParser << entryState.getStateName() << "[style=filled,fillcolor=%22%23b3ffff%22];%0A";
+	char* tmp = cleanCharArr<T>(entryState.getStateName());
+	dotParser << tmp << "[style=filled,fillcolor=%22%23b3ffff%22];%0A";
+	if (tmp != nullptr) delete[] tmp;
 	for (unsigned i = 0; i < statesCnt; i++)
 	{
 		for (unsigned j = 0; j < alphabetSize; j++)
@@ -970,7 +1017,11 @@ std::string DFAutomaton<T>::produceSvg() const {
 			else {
 				continue;
 			}
-			dotParser << states[i].getStateName() << "%20-%3E%20" << transitionTable[i][j].getStateName() << "[label%3D%22";
+
+			char* firstStateName = cleanCharArr<T>(states[i].getStateName());
+			char* secondStateName = cleanCharArr<T>(transitionTable[i][j].getStateName());
+			dotParser << firstStateName << "%20-%3E%20" << secondStateName << "[label%3D%22";
+			//dotParser << states[i].getStateName() << "%20-%3E%20" << transitionTable[i][j].getStateName() << "[label%3D%22";
 			for (unsigned h = 0; h < g - 1; h++)
 			{
 				dotParser << transitionSymbols[h];
@@ -979,6 +1030,9 @@ std::string DFAutomaton<T>::produceSvg() const {
 				}
 			}
 			dotParser << "%22];%0A";
+
+			if (firstStateName != nullptr) delete[] firstStateName;
+			if (secondStateName != nullptr) delete[] secondStateName;
 		}
 	}
 	dotParser << '}';

@@ -1,4 +1,5 @@
 ﻿#include "UserIO.h"
+#include "Operations.h"
 #include "State.h"
 
 
@@ -23,6 +24,9 @@ int printMenu() {
 	std::cout << "9 - view SVG of automat" << std::endl;
 	std::cout << "10 - read word" << std::endl; // checks if word exists in the language of the automaton
 	std::cout << "11 - print menu" << std::endl;
+	std::cout << "12 - apply union" << std::endl;
+	std::cout << "13 - apply intersection" << std::endl;
+	std::cout << "14 - apply complement" << std::endl;
 	std::cout << std::string(100, '*') << std::endl;
 
 	return 0;
@@ -67,6 +71,15 @@ int menu(int option, DFAutomaton<int>& automInt, DFAutomaton<char>& automChar) {
 		break;
 	case 11:
 		printMenu();
+		break;
+	case 12:
+		createUnion(automInt, automChar);
+		break;
+	case 13:
+		createIntersection(automInt, automChar);
+		break;
+	case 14:
+		createComplement(automInt, automChar);
 		break;
 	default:
 		break;
@@ -195,15 +208,100 @@ int printAutomatInFile(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar)
 	cout << "Please enter name of file to write in: ";
 	cin >> filename;
 	std::ofstream fout(filename);
-	
+
 	if (workingWithIntAutom) {
 		fout << automInt;
 	}
 	else {
-		fout << automInt;
+		fout << automChar;
 	}
 	fout.close();
 
+	return 0;
+}
+
+int createUnion(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar) {
+	DFAutomaton<int> secondAutomInt;
+	DFAutomaton<char> secondAutomChar;
+
+	cout << "Please enter 1 for entering the second automaton through the console, and 2 - from a file: ";
+	int flag; cin >> flag;
+	if (flag == 1) {
+		if (workingWithIntAutom) {
+			cin >> secondAutomInt;
+		}
+		else {
+			cin >> secondAutomChar;
+		}
+	}
+	else if (flag == 2) {
+		char filename[FILE_NAME_MAX_LEN];
+		cout << "Please enter name of file to read from: ";
+		cin >> filename;
+		std::ifstream fin(filename);
+		int f; fin >> f;
+		if (workingWithIntAutom) {
+			fin >> secondAutomInt;
+		}
+		else {
+			fin >> secondAutomChar;
+		}
+		fin.close();
+	}
+
+	if (workingWithIntAutom) {
+		automInt = automInt | secondAutomInt;
+	}
+	else {
+		automChar = automChar | secondAutomChar;
+	}
+
+	return 0;
+}
+int createIntersection(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar) {
+	DFAutomaton<int> secondAutomInt;
+	DFAutomaton<char> secondAutomChar;
+
+	cout << "Please enter 1 for entering the second automaton through the console, and 2 - from a file: ";
+	int flag; cin >> flag;
+	if (flag == 1) {
+		if (workingWithIntAutom) {
+			cin >> secondAutomInt;
+		}
+		else {
+			cin >> secondAutomChar;
+		}
+	}
+	else if (flag == 2) {
+		char filename[FILE_NAME_MAX_LEN];
+		cout << "Please enter name of file to read from: ";
+		cin >> filename;
+		std::ifstream fin(filename);
+		int f; fin >> f;
+		if (workingWithIntAutom) {
+			fin >> secondAutomInt;
+		}
+		else {
+			fin >> secondAutomChar;
+		}
+		fin.close();
+	}
+
+	if (workingWithIntAutom) {
+		automInt = automInt & secondAutomInt;
+	}
+	else {
+		automChar = automChar & secondAutomChar;
+	}
+	return 0;
+}
+int createComplement(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar) {
+	if (workingWithIntAutom) {
+		automInt ^ automInt;
+	}
+	else {
+		automChar ^ automChar;
+	}
 	return 0;
 }
 
@@ -227,7 +325,7 @@ int readWord(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar) {
 	else {
 		std::cout << "The word DOES NOT EXIST in the language of the automaton! :(";
 	}
-	std::cout << std::endl;
+	std::cout << std::endl << std::endl;
 
 	return 0;
 }
