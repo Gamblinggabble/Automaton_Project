@@ -32,4 +32,5 @@ private:
 	char* stateTry;
 	char* stateMarked;
 };
+
 std::ostream& operator<<(std::ostream&, AutomatonException&);

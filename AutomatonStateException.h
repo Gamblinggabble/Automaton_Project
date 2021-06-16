@@ -21,7 +21,6 @@ public:
 	const char* getFn() const;
 	const State& getStateNotFound() const;
 	unsigned getLine() const;
-	//Dari TODO: add setters
 private:
 
 	char* file;
@@ -30,6 +29,6 @@ private:
 	State stateNotFound;
 };
 
-std::ostream& operator<<(std::ostream&,const AutomatonStateException&);
+std::ostream& operator<<(std::ostream&, const AutomatonStateException&);
 
 #endif

@@ -63,7 +63,8 @@ AutomatonStateException& AutomatonStateException::operator=(const AutomatonState
 
 const char* AutomatonStateException::what() const noexcept
 {
-	return "You can't enter this final state, because there isn't such a state in the current automaton.";
+	//TODO: not final state, just state, because this exception is used in the enterying of a transition table
+	return "You can't enter this state, because there isn't such a state in the current automaton.";
 }
 
 
@@ -94,7 +95,6 @@ const State& AutomatonStateException::getStateNotFound() const {
 	return stateNotFound;
 };
 
-//Dari TODO: add setters
 
 std::ostream& operator <<(std::ostream& out, const AutomatonStateException& rhs) {
 	out << std::endl;

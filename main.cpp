@@ -20,8 +20,13 @@ int main() {
 	int option;
 	while (cin >> option) {
 		if (option == 0) break;
-		if (option > 11) {
-			cout << "Choose between options from -1 to 11! Choose option: ";
+		if (option > 14) {
+			cout << "Choose between options from -1 to 14! Choose option: ";
+			continue;
+		}
+		if ((option >= 12 && option <= 14) && (automInt.getTransitionTable() == nullptr && automInt.getTransitionTable() == nullptr)) {
+			cout << std::endl << "You must first create an automaton using option 1 or 2!" << std::endl;
+			cout << "Choose option: ";
 			continue;
 		}
 

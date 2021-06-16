@@ -276,12 +276,10 @@ template<typename T>
 DFAutomaton<T> operator&(const DFAutomaton<T>& automA, const DFAutomaton<T>& automB) {
 	return intersectionAutomaton(automA, automB);
 }
-
 template<typename T>
 DFAutomaton<T> operator|(const DFAutomaton<T>& automA, const DFAutomaton<T>& automB) {
 	return unionAutomaton(automA, automB);
 }
-
 template<typename T>
 DFAutomaton<T> operator^(DFAutomaton<T>& complement,const DFAutomaton<T>& automA) {
 	return complementAutomaton(complement,automA);

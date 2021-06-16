@@ -1,0 +1,18 @@
+2
+13 t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12
+7 d o i e n s g
+t0 t0 t0 t0 t0 t0 t0
+t2 t0 t0 t0 t0 t0 t0
+t0 t3 t11 t0 t0 t0 t0
+t0 t0 t4 t7 t9 t0 t0
+t0 t0 t0 t0 t5 t0 t0
+t0 t0 t0 t0 t0 t0 t6
+t0 t0 t0 t0 t0 t0 t0
+t0 t0 t0 t0 t0 t8 t0
+t0 t0 t0 t0 t0 t0 t0
+t0 t0 t0 t10 t0 t0 t0
+t0 t0 t0 t0 t0 t0 t0
+t12 t0 t0 t0 t0 t0 t0
+t0 t0 t0 t0 t0 t0 t0
+t1
+5 t3 t6 t8 t10 t12

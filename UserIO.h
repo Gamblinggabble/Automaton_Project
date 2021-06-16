@@ -24,9 +24,12 @@ int printTransitionTable(DFAutomaton<int>& automInt, DFAutomaton<char>& automCha
 int printAutomatOnConsole(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar);
 int printAutomatInFile(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar);
 
+int createUnion(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar);
+int createIntersection(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar);
+int createComplement(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar);
+
 int loadSVG(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar);
 int readWord(DFAutomaton<int>& automInt, DFAutomaton<char>& automChar);
-
 
 int clearConsole();
 
