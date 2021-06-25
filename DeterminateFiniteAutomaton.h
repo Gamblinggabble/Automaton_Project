@@ -930,6 +930,13 @@ bool DFAutomaton<T>::operator()(char* word) const {
 	unsigned i = 0;
 	State currentState = entryState;
 	unsigned currentStateIndex = 0;
+	for (unsigned i = 0; i < statesCnt; i++)
+	{
+		if (states[i] == entryState) {
+			currentStateIndex = i;
+			break;
+		}
+	}
 
 	while (word[i] != '\0') {
 
